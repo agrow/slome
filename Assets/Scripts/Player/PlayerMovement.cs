@@ -17,6 +17,16 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        // have to click off of UI element onto charater
+        // We need a toggle for the UI element to appear and dissappear
+        if (Keyboard.current != null && Keyboard.current.anyKey.isPressed &&
+        UnityEngine.EventSystems.EventSystem.current != null &&
+        UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject != null)
+        {
+            // A UI element is selected (e.g., input field), skip movement
+            return;
+        }
+
         _moveDirection = move.action.ReadValue<Vector2>();
         Debug.Log(_moveDirection);
         HandleAnimation();
