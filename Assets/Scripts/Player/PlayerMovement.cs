@@ -28,7 +28,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         _moveDirection = move.action.ReadValue<Vector2>();
-        Debug.Log(_moveDirection);
+        //Debug.Log(_moveDirection);
         HandleAnimation();
     }
 
