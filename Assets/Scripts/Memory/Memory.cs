@@ -2,15 +2,13 @@ using UnityEngine;
 
 public class Memory : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    /*
+        Long-Term Memory: Context we give the GBT
+        - Core Memories
+        - Important people
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        Short-Term Memory: All recent actions by player + prev emotional state + current emotional state
+
+        Contextual Mesh Memory: InWorld AI-- 
+    */
 }
