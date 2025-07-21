@@ -1030,6 +1030,10 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4278976767
       objectReference: {fileID: 0}
+    - target: {fileID: 4495017134120593922, guid: 5b3df161430d04be09297dd55ff0af9d, type: 3}
+      propertyPath: m_HorizontalAlignment
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4629409293947538564, guid: 5b3df161430d04be09297dd55ff0af9d, type: 3}
       propertyPath: m_GlobalPointSize
       value: 35
@@ -1105,6 +1109,18 @@ PrefabInstance:
     - target: {fileID: 5005917046301486399, guid: 5b3df161430d04be09297dd55ff0af9d, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5420364950985606949, guid: 5b3df161430d04be09297dd55ff0af9d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.0177
+      objectReference: {fileID: 0}
+    - target: {fileID: 5420364950985606949, guid: 5b3df161430d04be09297dd55ff0af9d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.0177
+      objectReference: {fileID: 0}
+    - target: {fileID: 5420364950985606949, guid: 5b3df161430d04be09297dd55ff0af9d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.0177
       objectReference: {fileID: 0}
     - target: {fileID: 5420364950985606949, guid: 5b3df161430d04be09297dd55ff0af9d, type: 3}
       propertyPath: m_AnchoredPosition.x
