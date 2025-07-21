@@ -47,4 +47,18 @@ public class PersonalityProfile
         mbti += "-" + ((identity == Identity.Assertive) ? "A" : "T");
         return mbti;
     }
+
+    // Need a database of personality types and what they offer
+    /*
+        ENTJ-A : The Adventurer 
+        - traits: outgoing, leader, fun
+        - baseline: PAD adjustments
+            - How To Intrepret Action : PAD Delta
+            - Curtain Actions you are more vulnerable too. 
+        - Description: _______ 
+    */
+
+
+    // Personality Will be Static:
+    // 
 }
