@@ -12,21 +12,31 @@ public class EmotionalState
     private float passion;
     private float commitment;
 
-    // Personality: e.g., MBTI type (used later for modulation)
-    public string mbtiType;
+    // Reference to the personality data
+    private readonly PersonalityTypeDefinition personality;
 
-    // we could structure base line emotions for personality like this?
-    public EmotionalState(string mbtiType = "INFP")
+    // Constructor
+    public EmotionalState(PersonalityTypeDefinition personality)
     {
-        this.mbtiType = mbtiType;
-        pleasure = 0f;
-        arousal = 0f;
-        dominance = 0f;
+        this.personality = personality;
+
+        // Initialize PAD using baselines (map [0,1] to [-1,1])
+        pleasure = NormalizeBaseline(personality.pleasureBaseline);
+        arousal = NormalizeBaseline(personality.arousalBaseline);
+        dominance = NormalizeBaseline(personality.dominanceBaseline);
+
         intimacy = 0f;
         passion = 0f;
         commitment = 0f;
     }
 
+    // Normalizes 0–1 to -1 to 1
+    private float NormalizeBaseline(float baseline)
+    {
+        return (baseline * 2f) - 1f;
+    }
+
+    // Read-only accessors
     public float Pleasure => pleasure;
     public float Arousal => arousal;
     public float Dominance => dominance;
@@ -49,47 +59,35 @@ public class EmotionalState
         set => commitment = Mathf.Clamp01(value);
     }
 
-    // Update PAD based on Triangle of Love values
+    // Update PAD based on Triangle of Love logic
     public void ApplyLoveTriangle()
     {
-        // Intimacy → Pleasure and Arousal (pleasure is more sensitive here?)
         if (intimacy > 0.6f)
         {
             pleasure += (intimacy - 0.6f) * 0.5f;
             arousal  += (intimacy - 0.6f) * 0.2f;
         }
 
-        // Passion → Arousal and Pleasure (arousal is more sensitive here?)
         if (passion > 0.5f)
         {
-            arousal  += (passion - 0.5f) * 0.6f; 
+            arousal  += (passion - 0.5f) * 0.6f;
             pleasure += (passion - 0.5f) * 0.3f;
         }
 
-        // Commitment → Dominance and Pleasure (dominance is more sensitive here?) 
-        // not sure if i am using dominance correctly here... not sure what else to use though
         if (commitment > 0.7f)
         {
             dominance += (commitment - 0.7f) * 0.4f;
-            pleasure += (commitment - 0.7f) * 0.2f;
+            pleasure  += (commitment - 0.7f) * 0.2f;
         }
 
         ClampPAD();
     }
 
-    // Clamp PAD values to [-1, 1]
     private void ClampPAD()
     {
         pleasure = Mathf.Clamp(pleasure, -1f, 1f);
         arousal = Mathf.Clamp(arousal, -1f, 1f);
         dominance = Mathf.Clamp(dominance, -1f, 1f);
-    }
-
-    // Optional: Apply personality effects (stubbed for now)
-    public void ApplyPersonalityInfluence()
-    {
-        // Future logic: Use MBTI types to bias PAD changes
-        // e.g., INFP might be more sensitive to intimacy (pleasure boost)
     }
 
     // Debug method
