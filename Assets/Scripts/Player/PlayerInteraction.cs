@@ -5,7 +5,7 @@ public class PlayerInteraction : MonoBehaviour
 {
     private NPC nearbyNPC;
 
-    private void OnTriggerEnter2D(Collider2D other)
+    private void OnTriggerEnter(Collider other)
     {
         NPC npc = other.GetComponent<NPC>();
         if (npc != null)
@@ -15,7 +15,7 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private void OnTriggerExit(Collider other)
     {
         NPC npc = other.GetComponent<NPC>();
         if (npc != null && npc == nearbyNPC)
@@ -32,10 +32,6 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Update()
     {
-        // if (Keyboard.current.eKey.wasPressedThisFrame && nearbyNPC != null)
-        // {
-        //     Debug.Log($"E pressed. Interacting with {nearbyNPC.npcName}");
-        //     nearbyNPC.Interact();
-        // }
+       
     }
 }
