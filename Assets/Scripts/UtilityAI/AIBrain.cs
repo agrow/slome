@@ -10,6 +10,7 @@ namespace TL.UtilityAI
     {
         public Action bestAction { get; set; } 
         private NPCController npc;
+        public bool finishedDeciding {get; set; }
 
         // Start is called before the first frame update
         void Start()
@@ -20,7 +21,10 @@ namespace TL.UtilityAI
         // Update is called once per frame
         void Update()
         {
-
+            if (bestAction is null)
+            {
+                DecideBestAction(npc.actionsAvailable);
+            }
         }
         // Purpose Statement: Picks out the best action, use a better data structure with faster lookup time majority queue?
         // Would there be an overhead with maintaining a majority queue vs. just score and iterating?
@@ -41,6 +45,7 @@ namespace TL.UtilityAI
             }
 
             bestAction = actionsAvailable[nextBestActionIndex];
+            finishedDeciding = true;
         }
         // Purpose Statement: Loop through all the considerations of the action
         // Score all the considerations
