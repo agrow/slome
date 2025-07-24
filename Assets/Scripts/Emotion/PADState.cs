@@ -12,7 +12,10 @@ public class EmotionalState
     private float passion;
     private float commitment;
 
-    // Reference to the personality data
+    private float lastIntimacy;
+    private float lastPassion;
+    private float lastCommitment;
+
     private readonly PersonalityTypeDefinition personality;
 
     // Constructor
@@ -25,18 +28,15 @@ public class EmotionalState
         arousal = NormalizeBaseline(personality.arousalBaseline);
         dominance = NormalizeBaseline(personality.dominanceBaseline);
 
-        intimacy = 0f;
-        passion = 0f;
-        commitment = 0f;
+        intimacy = passion = commitment = 0f;
+        lastIntimacy = lastPassion = lastCommitment = 0f;
     }
 
-    // Normalizes 0–1 to -1 to 1
     private float NormalizeBaseline(float baseline)
     {
         return (baseline * 2f) - 1f;
     }
 
-    // Read-only accessors
     public float Pleasure => pleasure;
     public float Arousal => arousal;
     public float Dominance => dominance;
@@ -59,9 +59,24 @@ public class EmotionalState
         set => commitment = Mathf.Clamp01(value);
     }
 
-    // Update PAD based on Triangle of Love logic
+    public void UpdateLoveValues(float intimacyDelta, float passionDelta, float commitmentDelta)
+    {
+        lastIntimacy = intimacy;
+        lastPassion = passion;
+        lastCommitment = commitment;
+
+        Intimacy += intimacyDelta;
+        Passion += passionDelta;
+        Commitment += commitmentDelta;
+
+        ApplyLoveTriangle();
+        LogStatusChanges();
+    }
+
+    // Adjust PAD based on current ToL values
     public void ApplyLoveTriangle()
     {
+        // Base effects
         if (intimacy > 0.6f)
         {
             pleasure += (intimacy - 0.6f) * 0.5f;
@@ -90,7 +105,28 @@ public class EmotionalState
         dominance = Mathf.Clamp(dominance, -1f, 1f);
     }
 
-    // Debug method
+    // Notification log for value drops
+    private void LogStatusChanges()
+    {
+        if (intimacy < lastIntimacy)
+        {
+            Debug.Log($"[ToL] Intimacy dropped to {intimacy:F2}");
+        }
+        if (passion < lastPassion)
+        {
+            Debug.Log($"[ToL] Passion dropped to {passion:F2}");
+        }
+        if (commitment < lastCommitment)
+        {
+            Debug.Log($"[ToL] Commitment dropped to {commitment:F2}");
+        }
+    }
+
+    public void DisplayLoveTriangle()
+    {
+        Debug.Log($"Love Triangle → Intimacy: {intimacy:F2}, Passion: {passion:F2}, Commitment: {commitment:F2}");
+    }
+
     public override string ToString()
     {
         return $"PAD: ({pleasure:F2}, {arousal:F2}, {dominance:F2}) | ToL: ({intimacy:F2}, {passion:F2}, {commitment:F2})";
