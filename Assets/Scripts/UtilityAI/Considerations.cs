@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TL.Core;
 using UnityEngine;
 
 namespace TL.UtilityAI
@@ -7,7 +8,7 @@ namespace TL.UtilityAI
     public abstract class Consideration : ScriptableObject
     {
         public string Name;
-        
+
         private float _score;
         public float score
         {
@@ -23,6 +24,6 @@ namespace TL.UtilityAI
             score = 0;
         }
 
-        public abstract float ScoreConsideration();
+        public abstract float ScoreConsideration(NPCController npc);
     }
 }

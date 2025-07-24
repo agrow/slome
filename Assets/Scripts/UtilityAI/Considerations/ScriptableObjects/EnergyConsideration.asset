@@ -13,3 +13,9 @@ MonoBehaviour:
   m_Name: EnergyConsideration
   m_EditorClassIdentifier: 
   Name: Energy
+  responseCurve:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

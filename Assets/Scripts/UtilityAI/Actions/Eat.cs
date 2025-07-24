@@ -20,6 +20,8 @@ namespace TL.UtilityAI.Actions
             // Logic for updating everything involved with eating 
 
             // Decide our new best action after you finished this one...
+            npc.stats.hunger -= 30;
+            npc.stats.money -= 10; //spend gold to eat
             npc.OnFinishedAction();
         }
     }

@@ -10,9 +10,12 @@ namespace TL.UtilityAI.Considerations
 
     public class HungerConsideration : Consideration
     {
-        public override float ScoreConsideration()
+        [SerializeField] private AnimationCurve responseCurve;
+
+        public override float ScoreConsideration(NPCController npc)
         {
-            return 0.9f;
+            score = responseCurve.Evaluate(Mathf.Clamp01(npc.stats.hunger / 100f)); // max 100 hunger, divide by max. 
+            return score;
         }
     }
 }
