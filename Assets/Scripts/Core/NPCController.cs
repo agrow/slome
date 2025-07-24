@@ -10,13 +10,24 @@ namespace TL.Core
     {
         public MoveController mover { get; set; }
         public AIBrain aiBrain { get; set; }
+        public NPCInventory Inventory {get; set;}
+        public Stats stats {get; set;}
+
         public Action[] actionsAvailable; //populate in inspector, what actions can NPC perform
+        public Context context;
+
+
+        //temp stats
+       
+
 
         // Start is called before the first frame update
         void Start()
         {
             mover = GetComponent<MoveController>();
             aiBrain = GetComponent<AIBrain>();
+            Inventory = GetComponent<NPCInventory>();
+            stats = GetComponent<Stats>();
         }
 
         // Update is called once per frame
@@ -27,6 +38,9 @@ namespace TL.Core
                 aiBrain.finishedDeciding = false;
                 aiBrain.bestAction.Execute(this);
             }
+
+            stats.UpdateEnergy(AmIAtRestDestination());
+            stats.UpdateHunger();
         }
 
 
@@ -34,6 +48,12 @@ namespace TL.Core
         {
             aiBrain.DecideBestAction(actionsAvailable);
         }
+
+        public bool AmIAtRestDestination()
+        {
+            return Vector3.Distance(this.transform.position, context.home.transform.position) <= context.MinDistance;
+        }
+
 
         #region Coroutine
         // Public Methods to Access the Coroutine Here: 
@@ -57,9 +77,9 @@ namespace TL.Core
                 counter--;
             }
             
-            Debug.Log("I just harvested 1 resource!");
+            Debug.Log("I am working! uwu");
             // Logic to update things involved with work
-
+            Inventory.AddResource(ResourceType.wood, 10);
             // Decide our new best action after you finished this one...
             OnFinishedAction();
 
@@ -76,6 +96,7 @@ namespace TL.Core
             
             Debug.Log("I just slept and gained 1 energy!");
             // Logic where updating energy these chnages, for later and implement that logic
+            stats.energy += 1;
             // Decide our new best action after you finished this one...
             OnFinishedAction();
 
