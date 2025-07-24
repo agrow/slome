@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TL.Core;
 
 namespace TL.UtilityAI
 {
@@ -30,6 +31,6 @@ namespace TL.UtilityAI
             score = 0;
         }
 
-        public abstract void Execute(); //general method that an action can run once its picked out! Later on GOAP. 
+        public abstract void Execute(NPCController npc); //general method that an action can run once its picked out! Later on GOAP. 
     }
 }
