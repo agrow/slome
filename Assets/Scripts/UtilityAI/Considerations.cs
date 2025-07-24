@@ -7,7 +7,7 @@ namespace TL.UtilityAI
     public abstract class Consideration : ScriptableObject
     {
         public string Name;
-
+        
         private float _score;
         public float score
         {

@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 namespace TL.Core
 {
+    //Purpose Statement: Moving NPC around the worldspace
     public class MoveController : MonoBehaviour
     {
         private NavMeshAgent agent;
