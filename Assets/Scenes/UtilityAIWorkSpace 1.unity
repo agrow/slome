@@ -1855,6 +1855,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f1845821195554e4ea77a1512dffaa5e, type: 2}
   - {fileID: 11400000, guid: 94af6a95ffbb04f0a869d6b44beacb55, type: 2}
   - {fileID: 11400000, guid: 030392ef0abed4c3a9ca502bfabe2257, type: 2}
+  - {fileID: 11400000, guid: 2541832673a544575b6af6ec3c5d3bba, type: 2}
 --- !u!136 &1175256506
 CapsuleCollider:
   m_ObjectHideFlags: 0
