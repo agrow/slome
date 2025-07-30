@@ -14,5 +14,13 @@ namespace TL.UtilityAI.Actions
             // Dependacy Injection: your class doesn't have a local refernence to an GameObject, but you can still require it. 
             npc.DoSleep(3);
         }
+
+        public override void SetRequiredDestination(NPCController npc)
+        {
+           RequiredDestination = npc.context.home.transform; // only one home right now in the game.
+           npc.mover.destination = RequiredDestination;
+        }
     }
+
+    
 }

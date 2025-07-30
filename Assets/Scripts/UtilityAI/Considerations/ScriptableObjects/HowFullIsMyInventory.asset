@@ -9,15 +9,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56d63b351659e4d69bbddfed4421ade4, type: 3}
-  m_Name: MoneyConsideration
+  m_Script: {fileID: 11500000, guid: 9bdf03b0e431e4fa4b8a19ce730ab756, type: 3}
+  m_Name: HowFullIsMyInventory
   m_EditorClassIdentifier: 
-  Name: MONEY CONSIDERATION - FOR WORK
+  Name: How Full is my Inventory
   responseCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.0010871887
+      time: 0.04
+      value: 0.049987793
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.7980792
+      value: 0.9791963
+      inSlope: 0.34478718
+      outSlope: 0.34478718
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.0650122
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
       value: 1
       inSlope: 0
       outSlope: 0
@@ -25,24 +43,6 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.5799173
-      value: 0.4595607
-      inSlope: -2.680427
-      outSlope: -2.680427
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.10570321
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
