@@ -1,134 +1,80 @@
 using UnityEngine;
 
+/// <summary>
+/// Represents the emotional state of a character using the PAD model and love components.
+/// </summary>
 public class EmotionalState
 {
-    // PAD values: range [-1, 1]
-    private float pleasure;
-    private float arousal;
-    private float dominance;
+    // PAD Model values (0 to 1)
+    public float Pleasure { get; set; }
+    public float Arousal { get; set; }
+    public float Dominance { get; set; }
 
-    // Triangle of Love values: range [0, 1]
-    private float intimacy;
-    private float passion;
-    private float commitment;
+    // Love components (0 to 1)
+    public float Intimacy { get; set; }
+    public float Passion { get; set; }
+    public float Commitment { get; set; }
 
-    private float lastIntimacy;
-    private float lastPassion;
-    private float lastCommitment;
+    // Previous love values for delta calculations
+    public float LastIntimacy { get; set; }
+    public float LastPassion { get; set; }
+    public float LastCommitment { get; set; }
 
-    private readonly PersonalityTypeDefinition personality;
+    // Optional: reference to personality data (can be null)
+    private PersonalityTypeDefinition personality;
 
-    // Constructor
+    /// <summary>
+    /// Default constructor for testing without personality input.
+    /// </summary>
+    public EmotionalState()
+    {
+        Pleasure = 0.5f;
+        Arousal = 0.5f;
+        Dominance = 0.5f;
+
+        Intimacy = Passion = Commitment = 0f;
+        LastIntimacy = LastPassion = LastCommitment = 0f;
+    }
+
+    /// <summary>
+    /// Constructor using personality definition.
+    /// </summary>
     public EmotionalState(PersonalityTypeDefinition personality)
     {
         this.personality = personality;
 
-        // Initialize PAD using baselines (map [0,1] to [-1,1])
-        pleasure = NormalizeBaseline(personality.pleasureBaseline);
-        arousal = NormalizeBaseline(personality.arousalBaseline);
-        dominance = NormalizeBaseline(personality.dominanceBaseline);
+        Pleasure = personality.pleasureBaseline;
+        Arousal = personality.arousalBaseline;
+        Dominance = personality.dominanceBaseline;
 
-        intimacy = passion = commitment = 0f;
-        lastIntimacy = lastPassion = lastCommitment = 0f;
+        Intimacy = Passion = Commitment = 0f;
+        LastIntimacy = LastPassion = LastCommitment = 0f;
     }
 
-    private float NormalizeBaseline(float baseline)
+    public void AdjustPAD(float pleasureDelta, float arousalDelta, float dominanceDelta)
     {
-        return (baseline * 2f) - 1f;
+        Pleasure = Mathf.Clamp01(Pleasure + pleasureDelta);
+        Arousal = Mathf.Clamp01(Arousal + arousalDelta);
+        Dominance = Mathf.Clamp01(Dominance + dominanceDelta);
     }
 
-    public float Pleasure => pleasure;
-    public float Arousal => arousal;
-    public float Dominance => dominance;
-
-    public float Intimacy
+    public void SetLoveComponents(float intimacy, float passion, float commitment)
     {
-        get => intimacy;
-        set => intimacy = Mathf.Clamp01(value);
+        LastIntimacy = Intimacy;
+        LastPassion = Passion;
+        LastCommitment = Commitment;
+
+        Intimacy = Mathf.Clamp01(intimacy);
+        Passion = Mathf.Clamp01(passion);
+        Commitment = Mathf.Clamp01(commitment);
     }
+    
+    public void ApplyLoveTriangle(float intimacy, float passion, float commitment)
+{
+    Intimacy = intimacy;
+    Passion = passion;
+    Commitment = commitment;
+}
 
-    public float Passion
-    {
-        get => passion;
-        set => passion = Mathf.Clamp01(value);
-    }
 
-    public float Commitment
-    {
-        get => commitment;
-        set => commitment = Mathf.Clamp01(value);
-    }
-
-    public void UpdateLoveValues(float intimacyDelta, float passionDelta, float commitmentDelta)
-    {
-        lastIntimacy = intimacy;
-        lastPassion = passion;
-        lastCommitment = commitment;
-
-        Intimacy += intimacyDelta;
-        Passion += passionDelta;
-        Commitment += commitmentDelta;
-
-        ApplyLoveTriangle();
-        LogStatusChanges();
-    }
-
-    // Adjust PAD based on current ToL values
-    public void ApplyLoveTriangle()
-    {
-        // Base effects
-        if (intimacy > 0.6f)
-        {
-            pleasure += (intimacy - 0.6f) * 0.5f;
-            arousal  += (intimacy - 0.6f) * 0.2f;
-        }
-
-        if (passion > 0.5f)
-        {
-            arousal  += (passion - 0.5f) * 0.6f;
-            pleasure += (passion - 0.5f) * 0.3f;
-        }
-
-        if (commitment > 0.7f)
-        {
-            dominance += (commitment - 0.7f) * 0.4f;
-            pleasure  += (commitment - 0.7f) * 0.2f;
-        }
-
-        ClampPAD();
-    }
-
-    private void ClampPAD()
-    {
-        pleasure = Mathf.Clamp(pleasure, -1f, 1f);
-        arousal = Mathf.Clamp(arousal, -1f, 1f);
-        dominance = Mathf.Clamp(dominance, -1f, 1f);
-    }
-
-    // Notification log for value drops
-    private void LogStatusChanges()
-    {
-        if (intimacy < lastIntimacy)
-        {
-            Debug.Log($"[ToL] Intimacy dropped to {intimacy:F2}");
-        }
-        if (passion < lastPassion)
-        {
-            Debug.Log($"[ToL] Passion dropped to {passion:F2}");
-        }
-        if (commitment < lastCommitment)
-        {
-            Debug.Log($"[ToL] Commitment dropped to {commitment:F2}");
-        }
-    }
-
-    public void DisplayLoveTriangle()
-    {
-        Debug.Log($"Love Triangle → Intimacy: {intimacy:F2}, Passion: {passion:F2}, Commitment: {commitment:F2}");
-    }
-
-    public override string ToString()
-    {
-        return $"PAD: ({pleasure:F2}, {arousal:F2}, {dominance:F2}) | ToL: ({intimacy:F2}, {passion:F2}, {commitment:F2})";
-    }
 }
