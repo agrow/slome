@@ -39,6 +39,7 @@ namespace TL.Core
             FSMTick();
         }
 
+        // Soap esque utility system: deciding, executing, movinh
         public void FSMTick()
         {
             if (currentState == State.decide)
@@ -82,7 +83,8 @@ namespace TL.Core
                 }
             }
         }
-
+        // All Actions CoRoutines Implemented Below! Even New ones: 
+        
         #region Workhorse methods
 
         public void OnFinishedAction()

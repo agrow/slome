@@ -40,6 +40,7 @@ namespace TL.Core
             }
         }
 
+        // How much decay per frame? ....
         [SerializeField] private float timeToDecreaseHunger = 5f;
         [SerializeField] private float timeToDecreaseEnergy = 5f;
         private float timeLeftEnergy;
@@ -72,7 +73,8 @@ namespace TL.Core
             //energy = 10;
             //money = 500;
         }
-        
+
+        // Update Stats
         private void OnEnable()
         {
             OnStatValueChanged += UpdateDisplayText;
@@ -82,7 +84,7 @@ namespace TL.Core
         {
             OnStatValueChanged -= UpdateDisplayText;
         }
-
+        //Updates Considerations per frame. 
         private void Update()
         {
             UpdateEnergy();
@@ -100,7 +102,7 @@ namespace TL.Core
             timeLeftHunger = timeToDecreaseHunger;
             hunger += 1;
         }
-
+        // loops per time interval, then decreases consideration, then next frame does it again after time. 
         public void UpdateEnergy()
         {
             if (timeLeftEnergy > 0)
@@ -113,6 +115,7 @@ namespace TL.Core
             energy -= 1;
         }
 
+        // Billboard Update
         void UpdateDisplayText()
         {
             billboard.UpdateStatsText(energy, hunger, money);
