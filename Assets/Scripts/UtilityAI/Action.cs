@@ -25,6 +25,7 @@ namespace TL.UtilityAI
 
         public Consideration[] considerations;
         // Considerations are information of the world about how urgent an action is. 
+        public Transform RequiredDestination {get; protected set;} // only things of the action class can set the variable, but publicly available
 
         public virtual void Awake() //instaniate score with 0, virtual? 
         {
@@ -32,5 +33,6 @@ namespace TL.UtilityAI
         }
 
         public abstract void Execute(NPCController npc); //general method that an action can run once its picked out! Later on GOAP. 
+        public virtual void SetRequiredDestination(NPCController npc) {}
     }
 }

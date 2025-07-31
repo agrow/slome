@@ -40,6 +40,7 @@ namespace TL.Core
             }
         }
 
+        // How much decay per frame? ....
         [SerializeField] private float timeToDecreaseHunger = 5f;
         [SerializeField] private float timeToDecreaseEnergy = 5f;
         private float timeLeftEnergy;
@@ -53,26 +54,27 @@ namespace TL.Core
         // Start is called before the first frame update
         void Start()
         {
-            //hunger = Random.Range(20, 80);
-            //energy = Random.Range(20, 80);
-            //money = Random.Range(10, 100);
+            // hunger = Random.Range(20, 80);
+            // energy = Random.Range(20, 80);
+            // money = Random.Range(10, 100);
 
-            // Test case: NPC will likely work
-            // hunger = 0;
-            // energy = 100;
-            // money = 50;
+            //// Test case: NPC will likely work
+            //hunger = 0;
+            //energy = 100;
+            //money = 50;
 
-            //// Test case: NPC will likely eat
-            // hunger = 90;
-            // energy = 50;
-            // money = 500;
+            // Test case: NPC will likely eat
+            hunger = 90;
+            energy = 50;
+            money = 500;
 
             //// Test case: NPC will likely sleep
-            hunger = 0;
-            energy = 10;
-            money = 500;
+            //hunger = 0;
+            //energy = 10;
+            //money = 500;
         }
 
+        // Update Stats
         private void OnEnable()
         {
             OnStatValueChanged += UpdateDisplayText;
@@ -81,6 +83,12 @@ namespace TL.Core
         private void OnDisable()
         {
             OnStatValueChanged -= UpdateDisplayText;
+        }
+        //Updates Considerations per frame. 
+        private void Update()
+        {
+            UpdateEnergy();
+            UpdateHunger();
         }
 
         public void UpdateHunger()
@@ -94,14 +102,9 @@ namespace TL.Core
             timeLeftHunger = timeToDecreaseHunger;
             hunger += 1;
         }
-
-        public void UpdateEnergy(bool shouldNotUpdateEnergy)
+        // loops per time interval, then decreases consideration, then next frame does it again after time. 
+        public void UpdateEnergy()
         {
-            if (shouldNotUpdateEnergy)
-            {
-                return;
-            }
-
             if (timeLeftEnergy > 0)
             {
                 timeLeftEnergy -= Time.deltaTime;
@@ -112,6 +115,7 @@ namespace TL.Core
             energy -= 1;
         }
 
+        // Billboard Update
         void UpdateDisplayText()
         {
             billboard.UpdateStatsText(energy, hunger, money);

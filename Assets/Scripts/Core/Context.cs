@@ -32,14 +32,13 @@ namespace TL.Core
             List<Transform> resources = new List<Transform>();
             foreach (Transform go in gameObjects)
             {
-                if (go.gameObject.tag == resourceTag)
+                if(go.gameObject.tag == resourceTag)
                 {
                     resources.Add(go);
                 }
             }
             return resources;
         }
-
 
     }
 }

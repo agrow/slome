@@ -22,7 +22,15 @@ namespace TL.UtilityAI.Actions
             // Decide our new best action after you finished this one...
             npc.stats.hunger -= 30;
             npc.stats.money -= 10; //spend gold to eat
-            npc.OnFinishedAction();
+            //npc.OnFinishedAction();
+
+            npc.aiBrain.finishedExecutingBestAction = true;
         }
+
+        public override void SetRequiredDestination(NPCController npc)
+        {
+            RequiredDestination = npc.transform;
+        }
+
     }
 }

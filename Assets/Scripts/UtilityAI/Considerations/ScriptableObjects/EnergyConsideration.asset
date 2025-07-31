@@ -12,10 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7348f2660b0404fcd99ddcd4c22bd4a0, type: 3}
   m_Name: EnergyConsideration
   m_EditorClassIdentifier: 
-  Name: Energy
+  Name: ENERGY CONSIDERATION - FOR SLEEPING
   responseCurve:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.00434494
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 136
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.99346924
+      value: -0.014286041
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
