@@ -5,9 +5,10 @@ public class PlayerControllerPixelArt : MonoBehaviour
 {
     public float speed; // modulates movement
     private Vector2 move; // input system values, -1 to 1
-    private Vector2 lastMove; // Used to save animator state to last direction when player stops moving
+    private Vector2 lastMove = new Vector2(0, -1); // Used to save animator state to last direction when player stops moving, seed with facing the camera
     //public float groundDist; // For if we want elevated ground/slopes w/o jumping (https://www.youtube.com/watch?v=cqNBA9Pslg8)
     //public LayerMask terrainLayer;
+    private Vector3 lastWorldSpaceMove = new Vector3(0, 0, -1); // Face the camera(?) at start
 
     public Rigidbody rb;
     public SpriteRenderer sr;
@@ -46,13 +47,15 @@ public class PlayerControllerPixelArt : MonoBehaviour
     // After camera's moved
     void LateUpdate()
     {
+        // Note, the player may not actually move
         movePlayerRelativeToCamera();
+
+        // TASK: Find the direction the player last moved, absolute
+        // And figure out what sprite to play relative to the camera
 
         // Time to deal with animations. First, determine if we are idle or moving
         if (move.x != 0 || move.y != 0)
         {
-            // If we are MOVING, save it as our last movement direction
-            lastMove = new Vector2(move.x, move.y);
             anim.SetBool("isMoving", true);
 
         }
@@ -63,11 +66,20 @@ public class PlayerControllerPixelArt : MonoBehaviour
             anim.SetBool("isMoving", false);
         }
 
+        // Figure out the last movement direction RELATIVE to where ever the camera is -- DONE
+
         // Does the blendtree handle diagonals automatically?
         // Sort of... really hard to idle facing a diagonal. 
-        // TODO: Test with joystick, refigure values
-        anim.SetFloat("lastMoveX", lastMove.x);
-        anim.SetFloat("lastMoveY", lastMove.y);
+        // TODO: Test with joystick
+        //anim.SetFloat("lastMoveX", lastMove.x);
+        //anim.SetFloat("lastMoveY", lastMove.y);
+        Vector3 camRelativeLastMove = cam.transform.InverseTransformDirection(lastWorldSpaceMove);
+
+        //Debug.Log(lastMove);
+        //Debug.Log(camRelativeLastMove);
+
+        anim.SetFloat("lastMoveX", camRelativeLastMove.x);
+        anim.SetFloat("lastMoveY", camRelativeLastMove.z);
 
     }
 
@@ -105,7 +117,17 @@ public class PlayerControllerPixelArt : MonoBehaviour
         Vector3 rightRelativeHorizontalMovement = move.x * camRight;
         Vector3 cameraRelativeMovement = forwardRelativeVerticalMovement + rightRelativeHorizontalMovement;
 
-        // Move the player
+        // Save these vectors for figuring out animations later
+        if (move.x != 0 || move.y != 0)
+        {
+            lastMove = new Vector2(move.x, move.y);
+            lastWorldSpaceMove = new Vector3(cameraRelativeMovement.x, cameraRelativeMovement.y, cameraRelativeMovement.z);
+        }
+        //Vector3 forwardRelVerticalLastMove = lastMove.x * camForward;
+        //Vector3 rightRelHorizontalLastMove = lastMove.y * camRight;
+        //lastCameraRelativeMove = forwardRelVerticalLastMove + rightRelHorizontalLastMove;
+
+            // Move the player
         transform.Translate(cameraRelativeMovement * speed * Time.deltaTime, Space.World);
     }
 }
