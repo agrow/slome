@@ -219,7 +219,7 @@ namespace TL.Core
         //  Update
         void UpdateDisplayText()
         {
-            billboard.UpdateStatsText(energy, hunger, money);
+            billboard.UpdateStatsText(energy, hunger, money, emotionalState);
         }
 
         // Method to get current emotional state (for considerations to use)
