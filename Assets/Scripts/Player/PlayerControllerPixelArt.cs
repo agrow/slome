@@ -9,18 +9,15 @@ public class PlayerControllerPixelArt : MonoBehaviour
     //public float groundDist; // For if we want elevated ground/slopes w/o jumping (https://www.youtube.com/watch?v=cqNBA9Pslg8)
     //public LayerMask terrainLayer;
     private Vector3 lastWorldSpaceMove = new Vector3(0, 0, -1); // Face the camera(?) at start
+    public float walkableRaycastHeight = 2f; // The distance above the rb.position to start the vertical movement raycast calculation
+    public LayerMask walkableMask; // Assign in Inspector to include all walkable surfaces
+    public float bodyHeightOffset = 0; // Distance from the collider center and the floor
 
     public Rigidbody rb;
     public SpriteRenderer sr;
     public Camera cam;
     public Animator anim;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
 
     // Update is called once per frame
     void Update()
@@ -44,12 +41,16 @@ public class PlayerControllerPixelArt : MonoBehaviour
         
     }
 
+    void FixedUpdate()
+    {
+        // Cinemachine brain functions have all been updated to FixedUpdate, otherwise there are jitters
+        // Note, the player may not actually move
+        movePlayerRelativeToCamera();
+    }
+
     // After camera's moved
     void LateUpdate()
     {
-        // Note, the player may not actually move
-        movePlayerRelativeToCamera();
-
         // TASK: Find the direction the player last moved, absolute
         // And figure out what sprite to play relative to the camera
 
@@ -88,20 +89,9 @@ public class PlayerControllerPixelArt : MonoBehaviour
         move = context.ReadValue<Vector2>();
     }
 
-    public void movePlayer()
-    {
-        // Started with this tutorial: https://www.youtube.com/watch?v=xF19LIYfUmY
-        // TODO GOAL: 
-        // 2. Don't reset to facing camera when no movement
-        // 3. Actually always rotate toward camera, but it's the movement/animation that plays differently
-        Vector3 movementAmt = new Vector3(move.x, 0f, move.y);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movementAmt), 0.15f);
-        transform.Translate(movementAmt * speed * Time.deltaTime, Space.World);
-    }
-
     public void movePlayerRelativeToCamera()
     {
-        // Code adapted from https://www.youtube.com/watch?v=7kGCrq1cJew timestamp 1:00
+        // Code originally adapted from https://www.youtube.com/watch?v=7kGCrq1cJew timestamp 1:00
         Vector3 camForward = cam.transform.forward;
         Vector3 camRight = cam.transform.right;
 
@@ -117,17 +107,35 @@ public class PlayerControllerPixelArt : MonoBehaviour
         Vector3 rightRelativeHorizontalMovement = move.x * camRight;
         Vector3 cameraRelativeMovement = forwardRelativeVerticalMovement + rightRelativeHorizontalMovement;
 
+        // Flat target position
+        Vector3 flatTarget = transform.position + cameraRelativeMovement * speed * Time.fixedDeltaTime;
+
         // Save these vectors for figuring out animations later
         if (move.x != 0 || move.y != 0)
         {
             lastMove = new Vector2(move.x, move.y);
             lastWorldSpaceMove = new Vector3(cameraRelativeMovement.x, cameraRelativeMovement.y, cameraRelativeMovement.z);
         }
-        //Vector3 forwardRelVerticalLastMove = lastMove.x * camForward;
-        //Vector3 rightRelHorizontalLastMove = lastMove.y * camRight;
-        //lastCameraRelativeMove = forwardRelVerticalLastMove + rightRelHorizontalLastMove;
 
-            // Move the player
-        transform.Translate(cameraRelativeMovement * speed * Time.deltaTime, Space.World);
+        // Adding back vertical movement
+        Vector3 rayOrigin = flatTarget + Vector3.up * walkableRaycastHeight;
+        Ray ray = new Ray(rayOrigin, Vector3.down);
+
+        // Check for length of walkable height *2 (sufficiently down, but not infinite) to find ground to snap to.
+        // And move the player
+        // TODO: This logic will need to completely change for jumping
+        if (Physics.Raycast(ray, out RaycastHit hit, walkableRaycastHeight * 2f, walkableMask))
+        {
+            Vector3 targetPos = new Vector3(flatTarget.x, hit.point.y + bodyHeightOffset, flatTarget.z);
+            rb.MovePosition(targetPos);
+        }
+        else
+        {
+            rb.MovePosition(flatTarget);
+        }
+
+        // Move the player
+        //transform.Translate(cameraRelativeMovement * speed * Time.deltaTime, Space.World);
+            
     }
 }

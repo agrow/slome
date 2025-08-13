@@ -1,0 +1,21 @@
+Open Tree
+MK2 - 2702
+MK3 - 2520
+MK4 - 2442
+
+Round Tree
+MK2 - 2198
+MK3 - 2322
+MK4 - 2499
+
+Little Tree
+MK1 - 2412
+MK2 - 2312
+MK3 - 2318
+MK4 - 1912
+
+Spruce Trees
+MK1 - 274
+MK2 - 354
+MK3 - 190
+MK4 - 358
