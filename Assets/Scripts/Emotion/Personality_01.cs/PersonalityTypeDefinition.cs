@@ -4,7 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PersonalityTypeDefinition", menuName = "NPC/Personality Type Definition")]
 public class PersonalityTypeDefinition : ScriptableObject
 {
-    public string typeName;
+    public string typeName;  
     [TextArea] public string description;
 
     [Range(0, 1)] public float sensitivity;

@@ -4,22 +4,24 @@ using UnityEngine;
 using TL.UtilityAI;
 
 namespace TL.Core
-{   
-    //Purpose Statement: 
+{
+    public enum State
+    {
+        decide,
+        move,
+        execute
+    }
+
     public class NPCController : MonoBehaviour
     {
         public MoveController mover { get; set; }
         public AIBrain aiBrain { get; set; }
-        public NPCInventory Inventory {get; set;}
-        public Stats stats {get; set;}
+        public NPCInventory Inventory { get; set; }
+        public Stats stats { get; set; }
 
-        public Action[] actionsAvailable; //populate in inspector, what actions can NPC perform
-        public Context context;
+        public Context context;        
 
-
-        //temp stats
-       
-
+        public State currentState { get; set; }
 
         // Start is called before the first frame update
         void Start()
@@ -28,25 +30,66 @@ namespace TL.Core
             aiBrain = GetComponent<AIBrain>();
             Inventory = GetComponent<NPCInventory>();
             stats = GetComponent<Stats>();
+            currentState = State.decide;
         }
 
         // Update is called once per frame
         void Update()
         {
-            if (aiBrain.finishedDeciding)
-            {
-                aiBrain.finishedDeciding = false;
-                aiBrain.bestAction.Execute(this);
-            }
-
-            stats.UpdateEnergy(AmIAtRestDestination());
-            stats.UpdateHunger();
+            FSMTick();
         }
 
+        // Soap esque utility system: deciding, executing, movinh
+        public void FSMTick()
+        {
+            if (currentState == State.decide)
+            {
+                aiBrain.DecideBestAction();
+
+                if (Vector3.Distance(aiBrain.bestAction.RequiredDestination.position, this.transform.position) < 3.5f)
+                {
+                    currentState = State.execute;
+                }
+                else
+                {
+                    currentState = State.move;
+                }
+            }
+            else if (currentState == State.move)
+            {
+                float distance = Vector3.Distance(aiBrain.bestAction.RequiredDestination.position, this.transform.position);
+                Debug.Log($"Destination: {mover.destination.name} | Distance: {distance}");
+                if ( distance < 3.5f)
+                {
+                    currentState = State.execute;
+                }
+                else
+                {
+                    Debug.Log("Still moving!");
+                    mover.MoveTo(aiBrain.bestAction.RequiredDestination.position);
+                }
+            }
+            else if (currentState == State.execute)
+            {
+                if (aiBrain.finishedExecutingBestAction == false)
+                {
+                    Debug.Log("Executing action");
+                    aiBrain.bestAction.Execute(this);
+                }
+                else if (aiBrain.finishedExecutingBestAction == true)
+                {
+                    Debug.Log("Exit execute state");
+                    currentState = State.decide;
+                }
+            }
+        }
+        // All Actions CoRoutines Implemented Below! Even New ones: 
+        
+        #region Workhorse methods
 
         public void OnFinishedAction()
         {
-            aiBrain.DecideBestAction(actionsAvailable);
+            aiBrain.DecideBestAction();
         }
 
         public bool AmIAtRestDestination()
@@ -54,9 +97,10 @@ namespace TL.Core
             return Vector3.Distance(this.transform.position, context.home.transform.position) <= context.MinDistance;
         }
 
+        #endregion
 
         #region Coroutine
-        // Public Methods to Access the Coroutine Here: 
+
         public void DoWork(int time)
         {
             StartCoroutine(WorkCoroutine(time));
@@ -67,40 +111,44 @@ namespace TL.Core
             StartCoroutine(SleepCoroutine(time));
         }
 
-        // Coroutines Implemented Here:
         IEnumerator WorkCoroutine(int time)
         {
             int counter = time;
-            while(counter > 0)
+            while (counter > 0)
             {
                 yield return new WaitForSeconds(1);
                 counter--;
             }
-            
-            Debug.Log("I am working! uwu");
+
+            Debug.Log("I AM WORKING!");
             // Logic to update things involved with work
             Inventory.AddResource(ResourceType.wood, 10);
-            // Decide our new best action after you finished this one...
-            OnFinishedAction();
 
+            // Decide our new best action after you finished this one
+            //OnFinishedAction();
+            aiBrain.finishedExecutingBestAction = true;
+            yield break;
         }
 
         IEnumerator SleepCoroutine(int time)
         {
             int counter = time;
-            while(counter > 0)
+            while (counter > 0)
             {
                 yield return new WaitForSeconds(1);
                 counter--;
             }
-            
-            Debug.Log("I just slept and gained 1 energy!");
-            // Logic where updating energy these chnages, for later and implement that logic
-            stats.energy += 1;
-            // Decide our new best action after you finished this one...
-            OnFinishedAction();
 
+            Debug.Log("I slept and gained 1 energy!");
+            // Logic to update energy
+            stats.energy += 5;
+
+            // Decide our new best action after you finished this one
+            //OnFinishedAction();
+            aiBrain.finishedExecutingBestAction = true;
+            yield break;
         }
+
 
         #endregion
     }
