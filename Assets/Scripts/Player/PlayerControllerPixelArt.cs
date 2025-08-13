@@ -44,12 +44,15 @@ public class PlayerControllerPixelArt : MonoBehaviour
         
     }
 
-    // After camera's moved
-    void LateUpdate()
+    void FixedUpdate()
     {
         // Note, the player may not actually move
         movePlayerRelativeToCamera();
+    }
 
+    // After camera's moved
+    void LateUpdate()
+    {
         // TASK: Find the direction the player last moved, absolute
         // And figure out what sprite to play relative to the camera
 
@@ -88,17 +91,6 @@ public class PlayerControllerPixelArt : MonoBehaviour
         move = context.ReadValue<Vector2>();
     }
 
-    public void movePlayer()
-    {
-        // Started with this tutorial: https://www.youtube.com/watch?v=xF19LIYfUmY
-        // TODO GOAL: 
-        // 2. Don't reset to facing camera when no movement
-        // 3. Actually always rotate toward camera, but it's the movement/animation that plays differently
-        Vector3 movementAmt = new Vector3(move.x, 0f, move.y);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movementAmt), 0.15f);
-        transform.Translate(movementAmt * speed * Time.deltaTime, Space.World);
-    }
-
     public void movePlayerRelativeToCamera()
     {
         // Code adapted from https://www.youtube.com/watch?v=7kGCrq1cJew timestamp 1:00
@@ -127,7 +119,8 @@ public class PlayerControllerPixelArt : MonoBehaviour
         //Vector3 rightRelHorizontalLastMove = lastMove.y * camRight;
         //lastCameraRelativeMove = forwardRelVerticalLastMove + rightRelHorizontalLastMove;
 
-            // Move the player
-        transform.Translate(cameraRelativeMovement * speed * Time.deltaTime, Space.World);
+        // Move the player
+        //transform.Translate(cameraRelativeMovement * speed * Time.deltaTime, Space.World);
+        rb.MovePosition(transform.position + cameraRelativeMovement * speed * Time.fixedDeltaTime);
     }
 }
