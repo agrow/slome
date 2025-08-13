@@ -249,11 +249,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 283306347}
-  - component: {fileID: 283306351}
   - component: {fileID: 283306350}
   - component: {fileID: 283306349}
   - component: {fileID: 283306348}
   - component: {fileID: 283306352}
+  - component: {fileID: 283306353}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -336,6 +336,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  walkableRaycastHeight: 1
+  walkableMask:
+    serializedVersion: 2
+    m_Bits: 64
   rb: {fileID: 283306350}
   sr: {fileID: 891500439}
   cam: {fileID: 330585545}
@@ -365,10 +369,23 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 1
-  m_Constraints: 116
+  m_Constraints: 112
   m_CollisionDetection: 0
---- !u!135 &283306351
-SphereCollider:
+--- !u!114 &283306352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 283306346}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd87ee5c232338149b8cf926a0b58ff6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  freezeXZAxis: 1
+--- !u!136 &283306353
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -385,22 +402,11 @@ SphereCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.119519815
-  m_Center: {x: 0, y: 0, z: 0.007772818}
---- !u!114 &283306352
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 283306346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd87ee5c232338149b8cf926a0b58ff6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  freezeXZAxis: 1
+  serializedVersion: 2
+  m_Radius: 0.06254483
+  m_Height: 0.26247954
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.007834848, z: 0}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -488,7 +494,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25220463, y: 0.028022375, z: -0.007306737, w: 0.9672405}
+  m_LocalRotation: {x: 0.25211644, y: 0.03793782, z: -0.009892155, w: 0.9669024}
   m_LocalPosition: {x: 0, y: 2.508, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -556,8 +562,8 @@ MonoBehaviour:
   IgnoreTimeScale: 0
   WorldUpOverride: {fileID: 0}
   ChannelMask: -1
-  UpdateMethod: 2
-  BlendUpdateMethod: 1
+  UpdateMethod: 0
+  BlendUpdateMethod: 0
   LensModeOverride:
     Enabled: 0
     DefaultMode: 2
@@ -1478,7 +1484,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1266078398}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2522046, y: 0.028022373, z: -0.007306737, w: 0.9672406}
+  m_LocalRotation: {x: 0.25211644, y: 0.037937816, z: -0.009892153, w: 0.9669024}
   m_LocalPosition: {x: 0, y: 2.508, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1607,7 +1613,7 @@ GameObject:
   - component: {fileID: 1747327693}
   - component: {fileID: 1747327692}
   - component: {fileID: 1747327691}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1715,7 +1721,7 @@ GameObject:
   - component: {fileID: 2070153239}
   - component: {fileID: 2070153241}
   - component: {fileID: 2070153240}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
