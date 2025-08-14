@@ -38,7 +38,7 @@ public class PlayerControllerPixelArt : MonoBehaviour
 
         */
 
-        
+
     }
 
     void FixedUpdate()
@@ -94,6 +94,7 @@ public class PlayerControllerPixelArt : MonoBehaviour
         // Code originally adapted from https://www.youtube.com/watch?v=7kGCrq1cJew timestamp 1:00
         Vector3 camForward = cam.transform.forward;
         Vector3 camRight = cam.transform.right;
+        bool isMoving = false;
 
         // Remove y movement for now, assuming a flat plane
         // TODO: terrain height variability & jumping
@@ -113,6 +114,7 @@ public class PlayerControllerPixelArt : MonoBehaviour
         // Save these vectors for figuring out animations later
         if (move.x != 0 || move.y != 0)
         {
+            isMoving = true;
             lastMove = new Vector2(move.x, move.y);
             lastWorldSpaceMove = new Vector3(cameraRelativeMovement.x, cameraRelativeMovement.y, cameraRelativeMovement.z);
         }
@@ -127,15 +129,31 @@ public class PlayerControllerPixelArt : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, walkableRaycastHeight * 2f, walkableMask))
         {
             Vector3 targetPos = new Vector3(flatTarget.x, hit.point.y + bodyHeightOffset, flatTarget.z);
-            rb.MovePosition(targetPos);
+            if (isMoving)
+            {
+                rb.MovePosition(targetPos);
+            }
+            else
+            {
+                rb.linearVelocity = Vector3.zero;
+            }
         }
         else
         {
-            rb.MovePosition(flatTarget);
+            if (isMoving)
+            {
+                rb.MovePosition(flatTarget);
+            }
+            else
+            {
+                rb.linearVelocity = Vector3.zero;
+            }
+
         }
 
         // Move the player
         //transform.Translate(cameraRelativeMovement * speed * Time.deltaTime, Space.World);
-            
+
     }
+
 }
