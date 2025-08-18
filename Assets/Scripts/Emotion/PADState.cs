@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// Represents the emotional state of a character using the PAD model and love components.
 /// </summary>
-public class EmotionalState
+public class EmotionalState: MonoBehaviour
 {
     // PAD Model values (0 to 1)
     public float Pleasure { get; set; }
@@ -25,7 +25,7 @@ public class EmotionalState
 
     /// <summary>
     /// Default constructor for testing without personality input.
-    /// </summary>
+    
     public EmotionalState()
     {
         Pleasure = 0.5f;

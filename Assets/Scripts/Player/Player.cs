@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y) * moveSpeed * Time.deltaTime;
-        transform.Translate(move, Space.World);
+        transform.Translate(move, Space.World);  
     }
 
     public void OnMove(InputAction.CallbackContext context)
