@@ -248,47 +248,49 @@ namespace TL.Core
     private void HandleAnimations()
 {
     if (anim == null || agent == null) return;
-
     Camera cam = Camera.main;
     if (cam == null) return;
 
-    // USE FSM STATE FOR RELIABLE MOVEMENT DETECTION
+    // Determine if NPC is moving
     bool isMoving = (currentState == State.move) && !agent.isStopped && agent.hasPath;
-    
-    // Fallback to velocity if FSM says we should be moving
+
     if (!isMoving && currentState == State.move)
     {
-        Vector3 velocity = agent.velocity;
-        isMoving = velocity.magnitude > 0.05f;
+        // Fallback: check velocity magnitude
+        isMoving = agent.velocity.magnitude > 0.05f;
     }
-    
+
     if (isMoving)
     {
-        // Get movement direction from NavMeshAgent
+        // ✅ Tell animator we’re moving
+        anim.SetBool("isMoving", true);
+
         Vector3 velocity = agent.velocity;
         if (velocity.magnitude > 0.01f)
         {
             lastMove = new Vector2(velocity.x, velocity.z).normalized;
         }
-        
-        // Convert to camera space
+
+        // Convert world-space to camera-relative direction
         Vector3 worldSpaceMovement = new Vector3(lastMove.x, 0, lastMove.y);
         Vector3 cameraRelativeMovement = cam.transform.InverseTransformDirection(worldSpaceMovement);
-        
-        
-       
+
+        // Update blend tree parameters
+        anim.SetFloat("lastMoveX", cameraRelativeMovement.x);
+        anim.SetFloat("lastMoveY", cameraRelativeMovement.z);
     }
     else
     {
-        // Keep last direction in camera space
+        // ✅ Idle: stop walking, but keep last facing direction
+        anim.SetBool("isMoving", false);
+
         Vector3 worldSpaceLastMove = new Vector3(lastMove.x, 0, lastMove.y);
         Vector3 cameraRelativeLastMove = cam.transform.InverseTransformDirection(worldSpaceLastMove);
-        
+
         anim.SetFloat("lastMoveX", cameraRelativeLastMove.x);
         anim.SetFloat("lastMoveY", cameraRelativeLastMove.z);
-        
     }
-}    
+}
         public void DoSleep(int duration)
         {
             Debug.Log($"{name}: DoSleep called - Duration: {duration} seconds");
