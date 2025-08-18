@@ -2,6 +2,7 @@ using TL.UtilityAI;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 namespace TL.Core
 {
@@ -24,6 +25,10 @@ namespace TL.Core
         
         [Header("Navigation")]
         public NavMeshAgent agent;
+
+        [Header("Social Interaction System")]
+        public bool isFlirting = false;
+        private Coroutine currentFlirtCoroutine;
 
         private NavMeshMoverWrapper _mover;
         public NavMeshMoverWrapper mover 
@@ -171,27 +176,65 @@ namespace TL.Core
                 Debug.Log($"\n--- {name}: DECIDE STATE ---");
                 Debug.Log($"{name}: Stats - Energy: {stats?.energy ?? -1}, Hunger: {stats?.hunger ?? -1}, Money: {stats?.money ?? -1}");
                 
-                aiBrain.DecideBestAction();
-                
-                if (aiBrain.bestAction == null)
+                // Check if we should use emotional actions instead of regular actions
+                EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
+                bool useEmotionalAction = false;
+                EmotionalAction selectedEmotionalAction = null;
+
+                if (emotionalBrain != null && ShouldUseEmotionalActions())
                 {
-                    Debug.LogError($"{name}: No best action found!");
-                    return;
+                    Debug.Log($"{name}: Using EmotionalAIBrain for decision making");
+                    emotionalBrain.DecideBestEmotionalAction(this);
+                    
+                    if (emotionalBrain.bestEmotionalAction != null)
+                    {
+                        selectedEmotionalAction = emotionalBrain.bestEmotionalAction;
+                        useEmotionalAction = true;
+                        Debug.Log($"{name}: Selected emotional action: {selectedEmotionalAction.Name} (score: {selectedEmotionalAction.score})");
+                    }
                 }
                 
-                Debug.Log($"{name}: Best action: {aiBrain.bestAction.Name} (score: {aiBrain.bestAction.score})");
-                
-                aiBrain.bestAction.SetRequiredDestination(this);
-                
-                if (aiBrain.bestAction.RequiredDestination == null)
+                // If no emotional action was selected, use regular AI decision making
+                if (!useEmotionalAction)
                 {
-                    Debug.LogError($"{name}: No destination set for action {aiBrain.bestAction.Name}!");
+                    Debug.Log($"{name}: Using regular AIBrain for decision making");
+                    aiBrain.DecideBestAction();
+                    
+                    if (aiBrain.bestAction == null)
+                    {
+                        Debug.LogError($"{name}: No best action found!");
+                        return;
+                    }
+                    
+                    Debug.Log($"{name}: Best action: {aiBrain.bestAction.Name} (score: {aiBrain.bestAction.score})");
+                }
+                
+                // Set destination based on action type
+                Transform targetDestination = null;
+                string actionName = "";
+                
+                if (useEmotionalAction)
+                {
+                    selectedEmotionalAction.SetRequiredDestination(this);
+                    targetDestination = selectedEmotionalAction.RequiredDestination;
+                    actionName = selectedEmotionalAction.Name;
+                }
+                else
+                {
+                    aiBrain.bestAction.SetRequiredDestination(this);
+                    targetDestination = aiBrain.bestAction.RequiredDestination;
+                    actionName = aiBrain.bestAction.Name;
+                }
+                
+                if (targetDestination == null)
+                {
+                    Debug.LogError($"{name}: No destination set for action {actionName}!");
                     return;
                 }
                 
                 if (agent != null)
                 {
-                    Vector3 destination = aiBrain.bestAction.RequiredDestination.position;
+                    Vector3 destination = targetDestination.position;
                     agent.SetDestination(destination);
                     agent.isStopped = false;
                     
@@ -228,76 +271,353 @@ namespace TL.Core
             }
             else if (currentState == State.execute)
             {
+                // Check if we're executing an emotional action
+                EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
+                bool isEmotionalAction = emotionalBrain != null && 
+                                        emotionalBrain.bestEmotionalAction != null;
                 
-                if (aiBrain.finishedExecutingBestAction == false)
+                if (isEmotionalAction)
                 {
-                    aiBrain.bestAction.Execute(this);
-                }
-                else if (aiBrain.finishedExecutingBestAction == true)
-                {
-                    if (agent != null)
+                    // Handle emotional action execution
+                    if (emotionalBrain.finishedExecutingBestEmotionalAction == false)
                     {
-                        agent.isStopped = false;
+                        emotionalBrain.bestEmotionalAction.Execute(this);
+                        emotionalBrain.finishedExecutingBestEmotionalAction = true; // Set to true after execution starts
                     }
-                    
-                    currentState = State.decide;
+                    else if (emotionalBrain.finishedExecutingBestEmotionalAction == true)
+                    {
+                        if (agent != null)
+                        {
+                            agent.isStopped = false;
+                        }
+                        
+                        // Reset emotional brain state
+                        emotionalBrain.finishedExecutingBestEmotionalAction = false;
+                        emotionalBrain.bestEmotionalAction = null;
+                        
+                        currentState = State.decide;
+                        Debug.Log($"{name}: Finished executing emotional action, returning to DECIDE");
+                    }
+                }
+                else
+                {
+                    // Handle regular action execution
+                    if (aiBrain.finishedExecutingBestAction == false)
+                    {
+                        aiBrain.bestAction.Execute(this);
+                    }
+                    else if (aiBrain.finishedExecutingBestAction == true)
+                    {
+                        if (agent != null)
+                        {
+                            agent.isStopped = false;
+                        }
+                        
+                        aiBrain.finishedExecutingBestAction = false; // Reset for next cycle
+                        currentState = State.decide;
+                        Debug.Log($"{name}: Finished executing regular action, returning to DECIDE");
+                    }
                 }
             }
         }
 
-    private void HandleAnimations()
-{
-    if (anim == null || agent == null) return;
-    Camera cam = Camera.main;
-    if (cam == null) return;
-
-    // Determine if NPC is moving
-    bool isMoving = (currentState == State.move) && !agent.isStopped && agent.hasPath;
-
-    if (!isMoving && currentState == State.move)
-    {
-        // Fallback: check velocity magnitude
-        isMoving = agent.velocity.magnitude > 0.05f;
-    }
-
-    if (isMoving)
-    {
-        // ✅ Tell animator we’re moving
-        anim.SetBool("isMoving", true);
-
-        Vector3 velocity = agent.velocity;
-        if (velocity.magnitude > 0.01f)
+        // Helper method to determine when to use emotional actions
+        private bool ShouldUseEmotionalActions()
         {
-            lastMove = new Vector2(velocity.x, velocity.z).normalized;
+            if (emotionalState == null) return false;
+
+            // Use emotional actions when:
+            // 1. High arousal (excited/passionate state)
+            // 2. High pleasure (happy/positive state)  
+            // 3. Player is nearby (social opportunity)
+
+            bool highArousal = emotionalState.Arousal > 0.6f;
+            bool highPleasure = emotionalState.Pleasure > 0.7f;
+            bool playerNearby = IsPlayerNearby();
+
+            bool shouldUse = highArousal || highPleasure || playerNearby;
+
+            if (shouldUse)
+            {
+                Debug.Log($"{name}: Should use emotional actions - Arousal: {emotionalState.Arousal:F2}, Pleasure: {emotionalState.Pleasure:F2}, Player nearby: {playerNearby}");
+            }
+
+            return shouldUse;
         }
 
-        // Convert world-space to camera-relative direction
-        Vector3 worldSpaceMovement = new Vector3(lastMove.x, 0, lastMove.y);
-        Vector3 cameraRelativeMovement = cam.transform.InverseTransformDirection(worldSpaceMovement);
+        // Helper method to check if player is nearby
+        private bool IsPlayerNearby()
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null) return false;
+            
+            float distance = Vector3.Distance(transform.position, player.transform.position);
+            float interactionRange = 10f; // You can make this configurable
+            
+            return distance <= interactionRange;
+        }
 
-        // Update blend tree parameters
-        anim.SetFloat("lastMoveX", cameraRelativeMovement.x);
-        anim.SetFloat("lastMoveY", cameraRelativeMovement.z);
-    }
-    else
-    {
-        // ✅ Idle: stop walking, but keep last facing direction
-        anim.SetBool("isMoving", false);
+        private void HandleAnimations()
+        {
+            if (anim == null || agent == null) return;
+            Camera cam = Camera.main;
+            if (cam == null) return;
 
-        Vector3 worldSpaceLastMove = new Vector3(lastMove.x, 0, lastMove.y);
-        Vector3 cameraRelativeLastMove = cam.transform.InverseTransformDirection(worldSpaceLastMove);
+            // Determine if NPC is moving
+            bool isMoving = (currentState == State.move) && !agent.isStopped && agent.hasPath;
 
-        anim.SetFloat("lastMoveX", cameraRelativeLastMove.x);
-        anim.SetFloat("lastMoveY", cameraRelativeLastMove.z);
-    }
-}
+            if (!isMoving && currentState == State.move)
+            {
+                // Fallback: check velocity magnitude
+                isMoving = agent.velocity.magnitude > 0.05f;
+            }
+
+            if (isMoving)
+            {
+                //  Tell animator we're moving
+                anim.SetBool("isMoving", true);
+
+                Vector3 velocity = agent.velocity;
+                if (velocity.magnitude > 0.01f)
+                {
+                    lastMove = new Vector2(velocity.x, velocity.z).normalized;
+                }
+
+                // Convert world-space to camera-relative direction
+                Vector3 worldSpaceMovement = new Vector3(lastMove.x, 0, lastMove.y);
+                Vector3 cameraRelativeMovement = cam.transform.InverseTransformDirection(worldSpaceMovement);
+
+                // Update blend tree parameters
+                anim.SetFloat("lastMoveX", cameraRelativeMovement.x);
+                anim.SetFloat("lastMoveY", cameraRelativeMovement.z);
+            }
+            else
+            {
+                //  Idle: stop walking, but keep last facing direction
+                anim.SetBool("isMoving", false);
+
+                Vector3 worldSpaceLastMove = new Vector3(lastMove.x, 0, lastMove.y);
+                Vector3 cameraRelativeLastMove = cam.transform.InverseTransformDirection(worldSpaceLastMove);
+
+                anim.SetFloat("lastMoveX", cameraRelativeLastMove.x);
+                anim.SetFloat("lastMoveY", cameraRelativeLastMove.z);
+            }
+        }
+
+        // MISSING METHODS - Added to fix the compilation errors
+
+        // Player Interaction Methods (REQUIRED by Flirt.cs and Socialize.cs)
+        public void DoFlirtWithPlayer(float duration)
+        {
+            if (isFlirting) return;
+            currentFlirtCoroutine = StartCoroutine(FlirtWithPlayerCoroutine(duration));
+        }
+
+        public void DoSocializeWithPlayer(float duration)
+        {
+            if (isFlirting) return;
+            currentFlirtCoroutine = StartCoroutine(SocializeWithPlayerCoroutine(duration));
+        }
+
+        // NPC Interaction Methods
+        public void DoFlirt(NPCController target, float duration)
+        {
+            if (isFlirting) return;
+            currentFlirtCoroutine = StartCoroutine(FlirtWithNPCCoroutine(target, duration));
+        }
+
+        public void DoSocialize(NPCController target, float duration)
+        {
+            if (isFlirting) return;
+            currentFlirtCoroutine = StartCoroutine(SocializeWithNPCCoroutine(target, duration));
+        }
+
+        // Coroutines - Updated with proper emotional state handling
+        private IEnumerator FlirtWithPlayerCoroutine(float duration)
+        {
+            isFlirting = true;
+            Debug.Log($"{name}: Starting flirt with Player for {duration} seconds");
+
+            // Face the player
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+                transform.rotation = Quaternion.LookRotation(directionToPlayer);
+            }
+
+            // Update emotional state using PAD values (not Passion/Intimacy)
+            if (emotionalState != null)
+            {
+                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.15f);
+                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.20f);
+                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.05f);
+            }
+
+            if (anim != null)
+            {
+                anim.SetBool("isFlirting", true);
+            }
+
+            yield return new WaitForSeconds(duration);
+
+            if (anim != null)
+            {
+                anim.SetBool("isFlirting", false);
+            }
+
+            Debug.Log($"{name}: Finished flirting with Player");
+            isFlirting = false;
+
+            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
+            if (emotionalBrain != null)
+            {
+                emotionalBrain.finishedExecutingBestEmotionalAction = true;
+            }
+        }
+
+        private IEnumerator SocializeWithPlayerCoroutine(float duration)
+        {
+            isFlirting = true;
+            Debug.Log($"{name}: Starting socialize with Player for {duration} seconds");
+
+            // Face the player
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
+                transform.rotation = Quaternion.LookRotation(directionToPlayer);
+            }
+
+            // Update emotional state using PAD values
+            if (emotionalState != null)
+            {
+                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.12f);
+                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.05f);
+                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.08f);
+            }
+
+            if (anim != null)
+            {
+                anim.SetBool("isSocializing", true);
+            }
+
+            yield return new WaitForSeconds(duration);
+
+            if (anim != null)
+            {
+                anim.SetBool("isSocializing", false);
+            }
+
+            Debug.Log($"{name}: Finished socializing with Player");
+            isFlirting = false;
+
+            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
+            if (emotionalBrain != null)
+            {
+                emotionalBrain.finishedExecutingBestEmotionalAction = true;
+            }
+        }
+
+        private IEnumerator FlirtWithNPCCoroutine(NPCController target, float duration)
+        {
+            isFlirting = true;
+            Debug.Log($"{name}: Starting flirt with {target.name} for {duration} seconds");
+            
+            // Face the target
+            Vector3 directionToTarget = (target.transform.position - transform.position).normalized;
+            transform.rotation = Quaternion.LookRotation(directionToTarget);
+            
+            // Update emotional states using PAD values
+            if (emotionalState != null)
+            {
+                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.10f);
+                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.15f);
+                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.05f);
+            }
+            
+            if (target.emotionalState != null)
+            {
+                target.emotionalState.Pleasure = Mathf.Clamp01(target.emotionalState.Pleasure + 0.08f);
+                target.emotionalState.Arousal = Mathf.Clamp01(target.emotionalState.Arousal + 0.10f);
+            }
+
+            if (anim != null)
+            {
+                anim.SetBool("isFlirting", true);
+            }
+            
+            yield return new WaitForSeconds(duration);
+
+            if (anim != null)
+            {
+                anim.SetBool("isFlirting", false);
+            }
+            
+            Debug.Log($"{name}: Finished flirting with {target.name}");
+            isFlirting = false;
+            
+            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
+            if (emotionalBrain != null)
+            {
+                emotionalBrain.finishedExecutingBestEmotionalAction = true;
+            }
+        }
+
+        private IEnumerator SocializeWithNPCCoroutine(NPCController target, float duration)
+        {
+            isFlirting = true;
+            Debug.Log($"{name}: Starting socialize with {target.name} for {duration} seconds");
+            
+            // Face the target
+            Vector3 directionToTarget = (target.transform.position - transform.position).normalized;
+            transform.rotation = Quaternion.LookRotation(directionToTarget);
+            
+            // Update emotional states using PAD values
+            if (emotionalState != null)
+            {
+                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.08f);
+                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.03f);
+                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.06f);
+            }
+            
+            if (target.emotionalState != null)
+            {
+                target.emotionalState.Pleasure = Mathf.Clamp01(target.emotionalState.Pleasure + 0.06f);
+                target.emotionalState.Arousal = Mathf.Clamp01(target.emotionalState.Arousal + 0.02f);
+                target.emotionalState.Dominance = Mathf.Clamp01(target.emotionalState.Dominance + 0.04f);
+            }
+
+            if (anim != null)
+            {
+                anim.SetBool("isSocializing", true);
+            }
+            
+            yield return new WaitForSeconds(duration);
+
+            if (anim != null)
+            {
+                anim.SetBool("isSocializing", false);
+            }
+            
+            Debug.Log($"{name}: Finished socializing with {target.name}");
+            isFlirting = false;
+            
+            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
+            if (emotionalBrain != null)
+            {
+                emotionalBrain.finishedExecutingBestEmotionalAction = true;
+            }
+        }
+
+        // Existing methods kept unchanged
         public void DoSleep(int duration)
         {
             Debug.Log($"{name}: DoSleep called - Duration: {duration} seconds");
             StartCoroutine(SleepCoroutine(duration));
         }
 
-        private System.Collections.IEnumerator SleepCoroutine(int duration)
+        private IEnumerator SleepCoroutine(int duration)
         {
             Debug.Log($"{name}: Starting to sleep for {duration} seconds");
             
@@ -325,14 +645,11 @@ namespace TL.Core
 
         public void DoWork(int duration)
         {
-            //Debug.Log($"{name}: DoWork called - Duration: {duration} seconds");
             StartCoroutine(WorkCoroutine(duration));
         }
 
-        private System.Collections.IEnumerator WorkCoroutine(int duration)
+        private IEnumerator WorkCoroutine(int duration)
         {
-            //Debug.Log($"{name}: Starting to work for {duration} seconds");
-            
             yield return new WaitForSeconds(duration);
             
             if (stats != null)
@@ -341,8 +658,6 @@ namespace TL.Core
                 int oldEnergy = stats.energy;
                 stats.money += 1;
                 stats.energy -= 1;
-                
-                //Debug.Log($"{name}: Finished working - Money: {oldMoney} → {stats.money}, Energy: {oldEnergy} → {stats.energy}");
             }
             
             aiBrain.finishedExecutingBestAction = true;

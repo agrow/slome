@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: af278e76ff4a5fd45aa177461f6365ea, type: 3}
+  m_Name: Socialize
+  m_EditorClassIdentifier: 
+  Name: 
+  actionType: 0
+  considerations: []
+  emotionalIntensity: 1
+  canSocializeWithPlayer: 1
+  playerSocializeRange: 8
+  npcSocializeRange: 10
+  extroversionMultiplier: 1
+  preferGroupSocialization: 0
