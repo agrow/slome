@@ -46,16 +46,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Depth: 0.2
-    - _Displacement: 0.5
+    - _Depth: 0.61
+    - _Displacement: 0.53
+    - _Noise_Scale: 15.4
     - _Normal_Strength: 1
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 1
-    - _Strength: 0.54
+    - _Strength: 0.74
     m_Colors:
-    - _DeepColor: {r: 0.04313723, g: 0.6745098, b: 0.8431373, a: 0.6941177}
-    - _ShallowColor: {r: 0.3820755, g: 1, b: 0.95312804, a: 0.56078434}
+    - _DeepColor: {r: 0.19971518, g: 0.697295, b: 0.8301887, a: 0.6941177}
+    - _ShallowColor: {r: 0.23549305, g: 0.7924528, b: 0.75015205, a: 0.56078434}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &3696058863918075394
