@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86d4968623151ee49a9aa73b6e1f0704, type: 3}
   m_Name: Flirt
   m_EditorClassIdentifier: 
-  Name: 
+  Name: Flirt
   actionType: 0
   considerations: []
   emotionalIntensity: 1
   canFlirtWithPlayer: 1
   playerFlirtRange: 5
   npcFlirtRange: 8
-  personalityMultiplier: 1
+  baseDuration: 5
+  minDuration: 3
+  maxDuration: 12

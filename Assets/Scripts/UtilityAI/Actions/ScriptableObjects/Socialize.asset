@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af278e76ff4a5fd45aa177461f6365ea, type: 3}
   m_Name: Socialize
   m_EditorClassIdentifier: 
-  Name: 
+  Name: Socialize
   actionType: 0
   considerations: []
   emotionalIntensity: 1
   canSocializeWithPlayer: 1
   playerSocializeRange: 8
   npcSocializeRange: 10
-  extroversionMultiplier: 1
+  baseDuration: 10
+  minDuration: 5
+  maxDuration: 20
   preferGroupSocialization: 0

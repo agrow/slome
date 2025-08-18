@@ -567,6 +567,7 @@ MonoBehaviour:
   actionsAvailable:
   - {fileID: 11400000, guid: 030392ef0abed4c3a9ca502bfabe2257, type: 2}
   - {fileID: 11400000, guid: 94af6a95ffbb04f0a869d6b44beacb55, type: 2}
+  - {fileID: 11400000, guid: 94af6a95ffbb04f0a869d6b44beacb55, type: 2}
 --- !u!114 &332759525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,7 +584,8 @@ MonoBehaviour:
   rb: {fileID: 332759527}
   sr: {fileID: 245223372}
   anim: {fileID: 245223370}
-  agent: {fileID: 0}
+  agent: {fileID: 332759526}
+  isFlirting: 1
 --- !u!195 &332759526
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -661,6 +663,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74a351957ef714db5bbe9f8ad6e2ccf5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  emotionalState: {fileID: 0}
   timeToDecreaseHunger: 5
   timeToDecreaseEnergy: 5
   billboard: {fileID: 1546551857}
@@ -2014,7 +2017,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 514566a183fa3104e86634145085baf0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.58
+      value: 0.51
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 514566a183fa3104e86634145085baf0, type: 3}
       propertyPath: m_LocalPosition.z
