@@ -98,26 +98,7 @@ namespace TL.UtilityAI
             emotionalState.Dominance = Mathf.Lerp(emotionalState.Dominance, targetPAD.z, influence);
         }
 
-        // Method for other systems to get personality-modified action multipliers
-        public float GetActionMultiplier(EmotionalActionType actionType)
-        {
-            if (personalityProfile == null) return 1f;
-
-            switch (actionType)
-            {
-                case EmotionalActionType.Social:
-                    return personalityProfile.GetSocialActionMultiplier();
-                
-                case EmotionalActionType.Romantic:
-                    return personalityProfile.GetRomanticActionMultiplier();
-                
-                case EmotionalActionType.Assertive:
-                    return personalityProfile.GetAssertiveActionMultiplier();
-                
-                default:
-                    return 1f;
-            }
-        }
+       
 
         // Get compatibility with another character's personality
         public float GetCompatibilityWith(MBTIPersonalityController other)

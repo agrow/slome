@@ -26,9 +26,11 @@ namespace TL.Core
         [Header("Navigation")]
         public NavMeshAgent agent;
 
-        [Header("Social Interaction System")]
+        [Header("Action States")]
         public bool isFlirting = false;
-        private Coroutine currentFlirtCoroutine;
+
+        public bool isSocializing = false; 
+        public bool isWorking = false;
 
         private NavMeshMoverWrapper _mover;
         public NavMeshMoverWrapper mover 
@@ -404,213 +406,31 @@ namespace TL.Core
             }
         }
 
-        // MISSING METHODS - Added to fix the compilation errors
-
-        // Player Interaction Methods (REQUIRED by Flirt.cs and Socialize.cs)
-        public void DoFlirtWithPlayer(float duration)
+        //action methods here
+        public void DoWork(int duration)
         {
-            if (isFlirting) return;
-            currentFlirtCoroutine = StartCoroutine(FlirtWithPlayerCoroutine(duration));
+            StartCoroutine(WorkCoroutine(duration));
         }
 
-        public void DoSocializeWithPlayer(float duration)
+        private IEnumerator WorkCoroutine(int duration)
         {
-            if (isFlirting) return;
-            currentFlirtCoroutine = StartCoroutine(SocializeWithPlayerCoroutine(duration));
-        }
-
-        // NPC Interaction Methods
-        public void DoFlirt(NPCController target, float duration)
-        {
-            if (isFlirting) return;
-            currentFlirtCoroutine = StartCoroutine(FlirtWithNPCCoroutine(target, duration));
-        }
-
-        public void DoSocialize(NPCController target, float duration)
-        {
-            if (isFlirting) return;
-            currentFlirtCoroutine = StartCoroutine(SocializeWithNPCCoroutine(target, duration));
-        }
-
-        // Coroutines - Updated with proper emotional state handling
-        private IEnumerator FlirtWithPlayerCoroutine(float duration)
-        {
-            isFlirting = true;
-            Debug.Log($"{name}: Starting flirt with Player for {duration} seconds");
-
-            // Face the player
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-            {
-                Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-                transform.rotation = Quaternion.LookRotation(directionToPlayer);
-            }
-
-            // Update emotional state using PAD values (not Passion/Intimacy)
-            if (emotionalState != null)
-            {
-                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.15f);
-                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.20f);
-                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.05f);
-            }
-
-            if (anim != null)
-            {
-                anim.SetBool("isFlirting", true);
-            }
-
-            yield return new WaitForSeconds(duration);
-
-            if (anim != null)
-            {
-                anim.SetBool("isFlirting", false);
-            }
-
-            Debug.Log($"{name}: Finished flirting with Player");
-            isFlirting = false;
-
-            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
-            if (emotionalBrain != null)
-            {
-                emotionalBrain.finishedExecutingBestEmotionalAction = true;
-            }
-        }
-
-        private IEnumerator SocializeWithPlayerCoroutine(float duration)
-        {
-            isFlirting = true;
-            Debug.Log($"{name}: Starting socialize with Player for {duration} seconds");
-
-            // Face the player
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-            {
-                Vector3 directionToPlayer = (player.transform.position - transform.position).normalized;
-                transform.rotation = Quaternion.LookRotation(directionToPlayer);
-            }
-
-            // Update emotional state using PAD values
-            if (emotionalState != null)
-            {
-                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.12f);
-                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.05f);
-                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.08f);
-            }
-
-            if (anim != null)
-            {
-                anim.SetBool("isSocializing", true);
-            }
-
-            yield return new WaitForSeconds(duration);
-
-            if (anim != null)
-            {
-                anim.SetBool("isSocializing", false);
-            }
-
-            Debug.Log($"{name}: Finished socializing with Player");
-            isFlirting = false;
-
-            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
-            if (emotionalBrain != null)
-            {
-                emotionalBrain.finishedExecutingBestEmotionalAction = true;
-            }
-        }
-
-        private IEnumerator FlirtWithNPCCoroutine(NPCController target, float duration)
-        {
-            isFlirting = true;
-            Debug.Log($"{name}: Starting flirt with {target.name} for {duration} seconds");
-            
-            // Face the target
-            Vector3 directionToTarget = (target.transform.position - transform.position).normalized;
-            transform.rotation = Quaternion.LookRotation(directionToTarget);
-            
-            // Update emotional states using PAD values
-            if (emotionalState != null)
-            {
-                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.10f);
-                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.15f);
-                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.05f);
-            }
-            
-            if (target.emotionalState != null)
-            {
-                target.emotionalState.Pleasure = Mathf.Clamp01(target.emotionalState.Pleasure + 0.08f);
-                target.emotionalState.Arousal = Mathf.Clamp01(target.emotionalState.Arousal + 0.10f);
-            }
-
-            if (anim != null)
-            {
-                anim.SetBool("isFlirting", true);
-            }
+            isWorking = true;
             
             yield return new WaitForSeconds(duration);
-
-            if (anim != null)
+            
+            if (stats != null)
             {
-                anim.SetBool("isFlirting", false);
+                int oldMoney = stats.money;
+                int oldEnergy = stats.energy;
+                stats.money += 1;
+                stats.energy -= 1;
+                Debug.Log($"{name}: Work complete - Money: {oldMoney} → {stats.money}, Energy: {oldEnergy} → {stats.energy}");
             }
             
-            Debug.Log($"{name}: Finished flirting with {target.name}");
-            isFlirting = false;
-            
-            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
-            if (emotionalBrain != null)
-            {
-                emotionalBrain.finishedExecutingBestEmotionalAction = true;
-            }
+            isWorking = false;
+            aiBrain.finishedExecutingBestAction = true;
         }
 
-        private IEnumerator SocializeWithNPCCoroutine(NPCController target, float duration)
-        {
-            isFlirting = true;
-            Debug.Log($"{name}: Starting socialize with {target.name} for {duration} seconds");
-            
-            // Face the target
-            Vector3 directionToTarget = (target.transform.position - transform.position).normalized;
-            transform.rotation = Quaternion.LookRotation(directionToTarget);
-            
-            // Update emotional states using PAD values
-            if (emotionalState != null)
-            {
-                emotionalState.Pleasure = Mathf.Clamp01(emotionalState.Pleasure + 0.08f);
-                emotionalState.Arousal = Mathf.Clamp01(emotionalState.Arousal + 0.03f);
-                emotionalState.Dominance = Mathf.Clamp01(emotionalState.Dominance + 0.06f);
-            }
-            
-            if (target.emotionalState != null)
-            {
-                target.emotionalState.Pleasure = Mathf.Clamp01(target.emotionalState.Pleasure + 0.06f);
-                target.emotionalState.Arousal = Mathf.Clamp01(target.emotionalState.Arousal + 0.02f);
-                target.emotionalState.Dominance = Mathf.Clamp01(target.emotionalState.Dominance + 0.04f);
-            }
-
-            if (anim != null)
-            {
-                anim.SetBool("isSocializing", true);
-            }
-            
-            yield return new WaitForSeconds(duration);
-
-            if (anim != null)
-            {
-                anim.SetBool("isSocializing", false);
-            }
-            
-            Debug.Log($"{name}: Finished socializing with {target.name}");
-            isFlirting = false;
-            
-            EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
-            if (emotionalBrain != null)
-            {
-                emotionalBrain.finishedExecutingBestEmotionalAction = true;
-            }
-        }
-
-        // Existing methods kept unchanged
         public void DoSleep(int duration)
         {
             Debug.Log($"{name}: DoSleep called - Duration: {duration} seconds");
@@ -638,26 +458,6 @@ namespace TL.Core
             if (anim != null)
             {
                 anim.SetBool("isSleeping", false);
-            }
-            
-            aiBrain.finishedExecutingBestAction = true;
-        }
-
-        public void DoWork(int duration)
-        {
-            StartCoroutine(WorkCoroutine(duration));
-        }
-
-        private IEnumerator WorkCoroutine(int duration)
-        {
-            yield return new WaitForSeconds(duration);
-            
-            if (stats != null)
-            {
-                int oldMoney = stats.money;
-                int oldEnergy = stats.energy;
-                stats.money += 1;
-                stats.energy -= 1;
             }
             
             aiBrain.finishedExecutingBestAction = true;

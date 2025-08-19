@@ -447,7 +447,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.25175703, y: 0.064058065, z: -0.016702922, w: 0.9655237}
+  m_LocalRotation: {x: 0.25175458, y: 0.06419821, z: -0.016739462, w: 0.9655144}
   m_LocalPosition: {x: 0, y: 2.508, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -544,6 +544,7 @@ GameObject:
   - component: {fileID: 332759525}
   - component: {fileID: 332759524}
   - component: {fileID: 332759529}
+  - component: {fileID: 332759530}
   m_Layer: 0
   m_Name: NPC
   m_TagString: npc
@@ -566,8 +567,6 @@ MonoBehaviour:
   billBoard: {fileID: 1546551857}
   actionsAvailable:
   - {fileID: 11400000, guid: 030392ef0abed4c3a9ca502bfabe2257, type: 2}
-  - {fileID: 11400000, guid: 94af6a95ffbb04f0a869d6b44beacb55, type: 2}
-  - {fileID: 11400000, guid: 94af6a95ffbb04f0a869d6b44beacb55, type: 2}
 --- !u!114 &332759525
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -586,6 +585,8 @@ MonoBehaviour:
   anim: {fileID: 245223370}
   agent: {fileID: 332759526}
   isFlirting: 1
+  isSocializing: 0
+  isWorking: 0
 --- !u!195 &332759526
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -667,6 +668,21 @@ MonoBehaviour:
   timeToDecreaseHunger: 5
   timeToDecreaseEnergy: 5
   billboard: {fileID: 1546551857}
+--- !u!114 &332759530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 332759523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f13346e66ab7534293ca90e00adbbd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emotionalActions:
+  - {fileID: 11400000, guid: 03b81f65d1e920a41a1e1c7cddb73686, type: 2}
+  showDebugLogs: 1
 --- !u!4 &334028846 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: a724b870c87889c44a8e8ef39901cd83, type: 3}
@@ -3160,19 +3176,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6656055504175677392, guid: b81d0634d262d6949aa0d233169ddfa2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9655237
+      value: 0.9655144
       objectReference: {fileID: 0}
     - target: {fileID: 6656055504175677392, guid: b81d0634d262d6949aa0d233169ddfa2, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.251757
+      value: 0.25175455
       objectReference: {fileID: 0}
     - target: {fileID: 6656055504175677392, guid: b81d0634d262d6949aa0d233169ddfa2, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.064058065
+      value: 0.0641982
       objectReference: {fileID: 0}
     - target: {fileID: 6656055504175677392, guid: b81d0634d262d6949aa0d233169ddfa2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.016702918
+      value: -0.016739458
       objectReference: {fileID: 0}
     - target: {fileID: 6656055504175677392, guid: b81d0634d262d6949aa0d233169ddfa2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -3205,6 +3221,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 4166298498968504754, guid: da564bb78b11a244bb7fce4a8eaf0d3a, type: 3}
       propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 4166298498968504754, guid: da564bb78b11a244bb7fce4a8eaf0d3a, type: 3}
+      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 4372419047844391233, guid: da564bb78b11a244bb7fce4a8eaf0d3a, type: 3}

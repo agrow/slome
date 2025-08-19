@@ -13,12 +13,10 @@ MonoBehaviour:
   m_Name: Flirt
   m_EditorClassIdentifier: 
   Name: Flirt
-  actionType: 0
-  considerations: []
-  emotionalIntensity: 1
-  canFlirtWithPlayer: 1
+  considerations:
+  - {fileID: 11400000, guid: 6febeeba48b3f8b40a73d34be2e3e00e, type: 2}
+  flirtDuration: 4
   playerFlirtRange: 5
-  npcFlirtRange: 8
-  baseDuration: 5
-  minDuration: 3
-  maxDuration: 12
+  pleasureChange: 0.1
+  arousalChange: 0.05
+  dominanceChange: 0.02

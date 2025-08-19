@@ -13,13 +13,9 @@ MonoBehaviour:
   m_Name: Socialize
   m_EditorClassIdentifier: 
   Name: Socialize
-  actionType: 0
-  considerations: []
-  emotionalIntensity: 1
-  canSocializeWithPlayer: 1
-  playerSocializeRange: 8
-  npcSocializeRange: 10
-  baseDuration: 10
-  minDuration: 5
-  maxDuration: 20
-  preferGroupSocialization: 0
+  considerations:
+  - {fileID: 11400000, guid: 3ea1a7ae83098c34d80766a61f626969, type: 2}
+  socializeDuration: 10
+  pleasureChange: 0.08
+  arousalChange: 0.03
+  dominanceChange: 0.04
