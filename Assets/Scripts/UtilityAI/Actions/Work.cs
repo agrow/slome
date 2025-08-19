@@ -11,7 +11,7 @@ namespace TL.UtilityAI.Actions
     {
         public override void Execute(NPCController npc)
         {
-            npc.DoWork(30);
+            npc.DoWork(3);
         }
 
         public override void SetRequiredDestination(NPCController npc)

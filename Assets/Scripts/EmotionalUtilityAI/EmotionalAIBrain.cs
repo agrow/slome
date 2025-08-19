@@ -8,212 +8,181 @@ namespace TL.UtilityAI
 {
     public class EmotionalAIBrain : MonoBehaviour
     {
+        [Header("Emotional Actions")]
         public EmotionalAction[] emotionalActions;
         public EmotionalAction bestEmotionalAction { get; set; }
         public bool finishedExecutingBestEmotionalAction { get; set; }
 
-        [Header("Player Tracking")]
-        public bool canInteractWithPlayer = true;
-        public float playerInteractionRange = 10f;
-        private Transform playerTransform;
-        private MBTIPersonalityController playerPersonality; // NEW: Track player personality
-
-        [Header("Personality Integration")]
-        private MBTIPersonalityController npcPersonality; // NEW: Track NPC's personality
+        [Header("Debug Settings")]
+        public bool showDebugLogs = true;
 
         private void Start()
         {
             finishedExecutingBestEmotionalAction = true;
-
-            // Get NPC's personality controller
-            npcPersonality = GetComponent<MBTIPersonalityController>();
-            if (npcPersonality != null)
+            
+            if (showDebugLogs)
             {
-                Debug.Log($"{name}: Found personality controller with type {npcPersonality.MBTIType}");
-            }
-
-            // Find player and their personality
-            GameObject player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
-            {
-                playerTransform = player.transform;
-                playerPersonality = player.GetComponent<MBTIPersonalityController>();
-
-                Debug.Log($"EmotionalAIBrain found player: {player.name}");
-                if (playerPersonality != null)
-                {
-                    Debug.Log($"Player personality type: {playerPersonality.MBTIType}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("EmotionalAIBrain: No player found with 'Player' tag!");
+                Debug.Log($"{name}: EmotionalAIBrain initialized with {emotionalActions.Length} emotional actions");
             }
         }
 
         public void DecideBestEmotionalAction(NPCController npc)
         {
-            float score = 0f;
-            int nextBestActionIndex = 0;
+            if (emotionalActions == null || emotionalActions.Length == 0)
+            {
+                Debug.LogError($"{npc.name}: No emotional actions assigned!");
+                bestEmotionalAction = null;
+                return;
+            }
+
+            float bestScore = 0f;
+            int bestActionIndex = -1;
+
+            if (showDebugLogs)
+            {
+                Debug.Log($"\n--- {npc.name}: Deciding Best Emotional Action ---");
+            }
+
+            // Score all emotional actions
             for (int i = 0; i < emotionalActions.Length; i++)
             {
-                if (ScoreEmotionalAction(npc, emotionalActions[i]) > score)
+                if (emotionalActions[i] == null)
                 {
-                    nextBestActionIndex = i;
-                    score = emotionalActions[i].score;
+                    Debug.LogWarning($"{npc.name}: Emotional action {i} is null!");
+                    continue;
+                }
+
+                float actionScore = ScoreEmotionalAction(npc, emotionalActions[i]);
+
+                if (showDebugLogs)
+                {
+                    Debug.Log($"{npc.name}: Action '{emotionalActions[i].Name}' scored: {actionScore:F3}");
+                }
+
+                if (actionScore > bestScore)
+                {
+                    bestScore = actionScore;
+                    bestActionIndex = i;
                 }
             }
 
-            bestEmotionalAction = emotionalActions[nextBestActionIndex];
-            Debug.Log($"{npc.name}: Best emotional action: {bestEmotionalAction.Name} (score: {bestEmotionalAction.score})");
+            // Set the best action
+            if (bestActionIndex >= 0 && bestScore > 0f)
+            {
+                bestEmotionalAction = emotionalActions[bestActionIndex];
+                
+                if (showDebugLogs)
+                {
+                    Debug.Log($"{npc.name}: Best emotional action: {bestEmotionalAction.Name} (score: {bestScore:F3})");
+                }
+            }
+            else
+            {
+                bestEmotionalAction = null;
+                
+                if (showDebugLogs)
+                {
+                    Debug.Log($"{npc.name}: No emotional action scored above 0");
+                }
+            }
         }
 
         public float ScoreEmotionalAction(NPCController npc, EmotionalAction emotionalAction)
         {
+            // Start with base score of 1.0 (same as regular utility AI)
             float score = 1f;
+            
+            // Check if considerations exist
+            if (emotionalAction.considerations == null || emotionalAction.considerations.Length == 0)
+            {
+                if (showDebugLogs)
+                {
+                    Debug.LogWarning($"{emotionalAction.Name}: No considerations assigned! Action will score 0.");
+                }
+                emotionalAction.score = 0;
+                return 0;
+            }
+            
+            // Score all considerations (SAME LOGIC AS REGULAR AI)
             for (int i = 0; i < emotionalAction.considerations.Length; i++)
             {
+                if (emotionalAction.considerations[i] == null)
+                {
+                    Debug.LogWarning($"{emotionalAction.Name}: Consideration {i} is null!");
+                    continue;
+                }
+                
                 float considerationScore = emotionalAction.considerations[i].ScoreConsideration(npc);
-                score *= considerationScore;
-
+                score *= considerationScore; // Multiply all consideration scores together
+                
+                if (showDebugLogs)
+                {
+                    Debug.Log($"  {emotionalAction.Name}: Consideration '{emotionalAction.considerations[i].name}' scored: {considerationScore:F3}");
+                }
+                
                 if (score == 0)
                 {
-                    emotionalAction.score = 0;
-                    return emotionalAction.score; // no point computing further
-                }
-            }
-
-            // Apply emotional multipliers based on PAD state
-            if (npc.emotionalState != null)
-            {
-                score = ApplyEmotionalModifiers(score, npc.emotionalState, emotionalAction);
-            }
-
-            // NEW: Apply personality-based modifiers
-            if (npcPersonality != null)
-            {
-                score = ApplyPersonalityModifiers(score, emotionalAction);
-            }
-
-            // Apply player proximity bonus for social actions
-            if (canInteractWithPlayer && playerTransform != null)
-            {
-                score = ApplyPlayerProximityModifiers(score, npc, emotionalAction);
-            }
-
-            emotionalAction.score = score;
-            return emotionalAction.score;
-        }
-
-        // NEW: Apply personality-based action modifiers
-        private float ApplyPersonalityModifiers(float baseScore, EmotionalAction action)
-        {
-            if (npcPersonality?.PersonalityProfile == null) return baseScore;
-
-            float personalityMultiplier = npcPersonality.GetActionMultiplier(action.actionType);
-
-            // Apply MBTI-based preferences
-            if (action.actionType == EmotionalActionType.Social && !npcPersonality.PrefersPlayerInteraction)
-            {
-                personalityMultiplier *= 0.7f; // Reduce social actions if doesn't prefer player interaction
-            }
-
-            if (action.actionType == EmotionalActionType.Assertive && npcPersonality.AvoidsConflict)
-            {
-                personalityMultiplier *= 0.3f; // Significantly reduce assertive actions for conflict-avoidant types
-            }
-
-            if (npcPersonality.showPersonalityDebug)
-            {
-                Debug.Log($"{npcPersonality.name} ({npcPersonality.MBTIType}): {action.actionType} personality multiplier = {personalityMultiplier:F2}");
-            }
-
-            return baseScore * personalityMultiplier;
-        }
-
-        private float ApplyEmotionalModifiers(float baseScore, EmotionalState state, EmotionalAction action)
-        {
-            float modifier = 1f;
-
-            // FIXED: Assuming PAD values are in 0-1 range (not -100 to 100)
-            // High pleasure increases social action likelihood
-            if (action.actionType == EmotionalActionType.Social)
-            {
-                modifier += state.Pleasure * 0.5f; // 0-0.5 bonus
-            }
-
-            // High arousal increases romantic action likelihood
-            if (action.actionType == EmotionalActionType.Romantic)
-            {
-                modifier += state.Arousal * 0.8f; // 0-0.8 bonus
-            }
-
-            // High dominance increases assertive actions
-            if (action.actionType == EmotionalActionType.Assertive)
-            {
-                modifier += state.Dominance * 0.6f; // 0-0.6 bonus
-            }
-
-            return baseScore * Mathf.Max(0.1f, modifier); // Ensure positive score
-        }
-
-        private float ApplyPlayerProximityModifiers(float baseScore, NPCController npc, EmotionalAction action)
-        {
-            float distanceToPlayer = Vector3.Distance(npc.transform.position, playerTransform.position);
-
-            // If player is within interaction range, boost social/romantic actions
-            if (distanceToPlayer <= playerInteractionRange)
-            {
-                // NEW: Factor in personality compatibility with player
-                float compatibilityBonus = 1f;
-                if (npcPersonality != null && playerPersonality != null)
-                {
-                    float compatibility = npcPersonality.GetCompatibilityWith(playerPersonality);
-                    compatibilityBonus = 0.5f + (compatibility * 0.5f); // Range: 0.5 to 1.0
-
-                    if (npcPersonality.showPersonalityDebug)
+                    if (showDebugLogs)
                     {
-                        Debug.Log($"{npc.name}: Personality compatibility with player: {compatibility:F2} (bonus: {compatibilityBonus:F2})");
+                        Debug.Log($"  {emotionalAction.Name}: Action zeroed out by consideration {i}");
                     }
-                }
-
-                if (action.actionType == EmotionalActionType.Social ||
-                    action.actionType == EmotionalActionType.Romantic)
-                {
-                    float proximityBonus = (playerInteractionRange - distanceToPlayer) / playerInteractionRange;
-                    return baseScore * compatibilityBonus * (1f + proximityBonus); // Return modified score
+                    emotionalAction.score = 0;
+                    return emotionalAction.score;
                 }
             }
-
-            // Return the original score if no modifications apply
-            return baseScore;
+            
+            if (showDebugLogs)
+            {
+                Debug.Log($"  {emotionalAction.Name}: Base score after considerations: {score:F3}");
+            }
+            
+            // Apply the same averaging scheme as regular utility AI
+            if (emotionalAction.considerations.Length > 0)
+            {
+                float originalScore = score;
+                float modFactor = 1 - (1f / emotionalAction.considerations.Length);
+                float makeupValue = (1 - originalScore) * modFactor;
+                score = originalScore + (makeupValue * originalScore);
+                
+                if (showDebugLogs)
+                {
+                    Debug.Log($"  {emotionalAction.Name}: Score after averaging: {score:F3}");
+                }
+            }
+            
+            // Store and return the final score
+            emotionalAction.score = score;
+            return score;
         }
 
-
-
-// instead of direct access
+        // Helper method for considerations that need to find the player
         public Transform GetPlayerTransform()
         {
-            if (playerTransform == null)
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
             {
-                // Try to find the player
-                GameObject player = GameObject.FindGameObjectWithTag("Player");
-                if (player != null)
-                {
-                    playerTransform = player.transform;
-                }
-                else
-                {
-                    // Fallback: find any object with "Player" in the name
-                    GameObject fallbackPlayer = GameObject.Find("Player");
-                    if (fallbackPlayer != null)
-                    {
-                        playerTransform = fallbackPlayer.transform;
-                    }
-                }
+                return player.transform;
             }
+            
+            // Fallback: find any object with "Player" in the name
+            GameObject fallbackPlayer = GameObject.Find("Player");
+            if (fallbackPlayer != null)
+            {
+                return fallbackPlayer.transform;
+            }
+            
+            return null;
+        }
 
-            return playerTransform;
+        // Helper method for considerations that need player distance
+        public float GetDistanceToPlayer(NPCController npc)
+        {
+            Transform player = GetPlayerTransform();
+            if (player != null)
+            {
+                return Vector3.Distance(npc.transform.position, player.transform.position);
+            }
+            return float.MaxValue;
         }
     }
 }

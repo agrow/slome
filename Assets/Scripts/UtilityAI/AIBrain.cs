@@ -20,6 +20,7 @@ namespace TL.UtilityAI
         [SerializeField] private Action[] actionsAvailable; //populate in inspector, what actions can NPC perform
 
 
+
         // Start is called before the first frame update
         void Start()
         {
@@ -44,6 +45,7 @@ namespace TL.UtilityAI
         public void DecideBestAction()
         {
             finishedExecutingBestAction = false; // reset variable 
+           
             float score = 0f;
             int nextBestActionIndex = 0;
             for (int i = 0; i < actionsAvailable.Length; i++)
