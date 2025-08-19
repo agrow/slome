@@ -32,6 +32,8 @@ namespace TL.Core
         public bool isSocializing = false; 
         public bool isWorking = false;
 
+        public bool isExecutingAction = false; 
+
         private NavMeshMoverWrapper _mover;
         public NavMeshMoverWrapper mover 
         { 
@@ -96,7 +98,7 @@ namespace TL.Core
                 }
                 else
                 {
-                    Debug.Log($"{name}: ✅ NavMeshAgent is properly on NavMesh!");
+                    Debug.Log($"{name}:  NavMeshAgent is properly on NavMesh!");
                 }
 
                 _mover = new NavMeshMoverWrapper(agent);
@@ -172,7 +174,7 @@ namespace TL.Core
                 Debug.LogError($"{name}: Cannot tick FSM - AIBrain is null!");
                 return;
             }
-
+        
             if (currentState == State.decide)
             {
                 Debug.Log($"\n--- {name}: DECIDE STATE ---");
@@ -182,7 +184,7 @@ namespace TL.Core
                 EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
                 bool useEmotionalAction = false;
                 EmotionalAction selectedEmotionalAction = null;
-
+        
                 if (emotionalBrain != null && ShouldUseEmotionalActions())
                 {
                     Debug.Log($"{name}: Using EmotionalAIBrain for decision making");
@@ -280,13 +282,17 @@ namespace TL.Core
                 
                 if (isEmotionalAction)
                 {
-                    // Handle emotional action execution
-                    if (emotionalBrain.finishedExecutingBestEmotionalAction == false)
+                    // Handle emotional action execution - ONLY execute once
+                    if (!isExecutingAction)
                     {
+                        Debug.Log($"{name}: Starting emotional action: {emotionalBrain.bestEmotionalAction.Name}");
+                        isExecutingAction = true;
+                        emotionalBrain.finishedExecutingBestEmotionalAction = false; // Ensure it's false
                         emotionalBrain.bestEmotionalAction.Execute(this);
-                        emotionalBrain.finishedExecutingBestEmotionalAction = true; // Set to true after execution starts
                     }
-                    else if (emotionalBrain.finishedExecutingBestEmotionalAction == true)
+                    
+                    // Wait for emotional action coroutine to signal completion
+                    if (emotionalBrain.finishedExecutingBestEmotionalAction)
                     {
                         if (agent != null)
                         {
@@ -294,6 +300,7 @@ namespace TL.Core
                         }
                         
                         // Reset emotional brain state
+                        isExecutingAction = false;
                         emotionalBrain.finishedExecutingBestEmotionalAction = false;
                         emotionalBrain.bestEmotionalAction = null;
                         
@@ -303,26 +310,33 @@ namespace TL.Core
                 }
                 else
                 {
-                    // Handle regular action execution
-                    if (aiBrain.finishedExecutingBestAction == false)
+                    // Handle regular action execution - ONLY execute once
+                    if (!isExecutingAction)
                     {
+                        Debug.Log($"{name}: Starting regular action: {aiBrain.bestAction.Name}");
+                        isExecutingAction = true;
+                        aiBrain.finishedExecutingBestAction = false; // Ensure it's false
                         aiBrain.bestAction.Execute(this);
                     }
-                    else if (aiBrain.finishedExecutingBestAction == true)
+                    
+                    // Wait for regular action coroutine to signal completion
+                    if (aiBrain.finishedExecutingBestAction)
                     {
                         if (agent != null)
                         {
                             agent.isStopped = false;
                         }
                         
-                        aiBrain.finishedExecutingBestAction = false; // Reset for next cycle
+                        // Reset regular brain state
+                        isExecutingAction = false;
+                        aiBrain.finishedExecutingBestAction = false;
+                        
                         currentState = State.decide;
                         Debug.Log($"{name}: Finished executing regular action, returning to DECIDE");
                     }
                 }
             }
         }
-
         // Helper method to determine when to use emotional actions
         private bool ShouldUseEmotionalActions()
         {
@@ -333,8 +347,8 @@ namespace TL.Core
             // 2. High pleasure (happy/positive state)  
             // 3. Player is nearby (social opportunity)
 
-            bool highArousal = emotionalState.Arousal > 0.6f;
-            bool highPleasure = emotionalState.Pleasure > 0.7f;
+            bool highArousal = emotionalState.Arousal > 0.0f;
+            bool highPleasure = emotionalState.Pleasure > 0.0f;
             bool playerNearby = IsPlayerNearby();
 
             bool shouldUse = highArousal || highPleasure || playerNearby;
