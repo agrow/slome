@@ -8,7 +8,7 @@ namespace TL.UtilityAI
 {
     public class EmotionalAIBrain : MonoBehaviour
     {
-        [Header("Emotional Actions")]
+        [Header("Emotional Actions")]     
         public EmotionalAction[] emotionalActions;
         public EmotionalAction bestEmotionalAction { get; set; }
         public bool finishedExecutingBestEmotionalAction { get; set; }

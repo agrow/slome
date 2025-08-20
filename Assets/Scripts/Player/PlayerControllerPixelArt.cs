@@ -11,7 +11,7 @@ public class PlayerControllerPixelArt : MonoBehaviour
     private Vector3 lastWorldSpaceMove = new Vector3(0, 0, -1); // Face the camera(?) at start
     public float walkableRaycastHeight = 1f; // The distance above the rb.position to start the vertical movement raycast calculation
     public LayerMask walkableMask; // Assign in Inspector to include all walkable surfaces
-    public float bodyHeightOffset = .24f; // Distance from the collider center and the floor
+    public float bodyHeightOffset = .24f; // Distance from the collider center and the floor  
 
     public Rigidbody rb;
     public SpriteRenderer sr;
