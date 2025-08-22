@@ -25,6 +25,9 @@ namespace TL.Core
         
         [Header("Navigation")]
         public NavMeshAgent agent;
+        [SerializeField, Range(1f, 20f)] // This creates a slider in the Inspector
+        private float interactionRange = 5f;
+
 
         [Header("Action States")]
         public bool isFlirting = false;
