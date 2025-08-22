@@ -11,7 +11,7 @@ namespace TL.EmotionalAI
         public Axis axis = Axis.DeltaA;
         public bool invert = false;       // Neg = mirror
         [SerializeField] float range = 0.35f;
-
+        // What does this range do?
         public override float ScoreConsideration(EmotionModel emo)
         {
             float raw = axis switch { Axis.DeltaP => emo.lastDeltaApplied.x, Axis.DeltaA => emo.lastDeltaApplied.y, _ => emo.lastDeltaApplied.z };

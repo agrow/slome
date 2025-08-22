@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace TL.EmotionalAI
 {
+    // Purpose Statement: mirrors AIBrain: loop actions → compute scores → pick max → execute.
     public class EmotionBrain : MonoBehaviour
     {
         [SerializeField] private EmotionModel emotion;

@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace TL.EmotionalAI
 {
+    // Purpose Statemeent: single entry-point you call from gameplay/UI:
+    // OnPlayerAction(action, intensity01) → runs the model + brain in one go.
     public class EmotionAdapter : MonoBehaviour
     {
         [SerializeField] private EmotionModel emotion;
@@ -13,7 +15,7 @@ namespace TL.EmotionalAI
         {
             // Action => ______ => Change PAD
             emotion.ApplyPlayerAction(action, intensity01);
-            
+
             // UtilityAI Based off of new State
             brain.DecideBestEmotionalAction();
 

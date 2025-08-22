@@ -2,6 +2,10 @@ using UnityEngine;
 
 namespace TL.EmotionalAI
 {
+    /* Purpose Statement: 
+    ScriptableObject action: has considerations[] → multiply (AND-like) → Dave Mark makeup → utilityCurve → score.
+    Execute() hook for animation/dialogue, cooldown, weight.
+    */
     public abstract class EmotionalAction : ScriptableObject
     {
         public string Name;
