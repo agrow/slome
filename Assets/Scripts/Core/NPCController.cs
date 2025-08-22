@@ -52,7 +52,8 @@ namespace TL.Core
             idle,
             move,
             execute,
-            decide
+            decide,
+            active
         }
         
         private Vector2 lastMove;
@@ -173,6 +174,14 @@ namespace TL.Core
             {
                 Debug.LogError($"{name}: Cannot tick FSM - AIBrain is null!");
                 return;
+            }
+
+            if (currentState == State.active)
+            {
+                // The Emotional AI Brain should be listening for players response
+                // Interpret the action of the player
+                // Enter the Emotional Utility System 
+    
             }
         
             if (currentState == State.decide)
@@ -340,35 +349,49 @@ namespace TL.Core
         // Helper method to determine when to use emotional actions
         private bool ShouldUseEmotionalActions()
         {
-            if (emotionalState == null) return false;
+            bool shouldUse = false;
+            // if player pressed T next to the NPC, it means the player intends to interact with you
+            if (Input.GetKeyDown(KeyCode.T) && IsPlayerNearby())
+            {
+                Debug.Log($"{name}: Player pressed T, so we should use emotional actions");
+                shouldUse = true;
+            }         
+            // if (emotionalState == null) return false;
 
             // Use emotional actions when:
             // 1. High arousal (excited/passionate state)
             // 2. High pleasure (happy/positive state)  
             // 3. Player is nearby (social opportunity)
 
-            bool highArousal = emotionalState.Arousal > 0.0f;
-            bool highPleasure = emotionalState.Pleasure > 0.0f;
-            bool playerNearby = IsPlayerNearby();
+            // bool highArousal = emotionalState.Arousal > 0.0f;
+            // bool highPleasure = emotionalState.Pleasure > 0.0f;
+            // bool playerNearby = IsPlayerNearby();
 
-            bool shouldUse = highArousal || highPleasure || playerNearby;
+            // bool shouldUse = highArousal || highPleasure || playerNearby;
 
-            if (shouldUse)
-            {
-                Debug.Log($"{name}: Should use emotional actions - Arousal: {emotionalState.Arousal:F2}, Pleasure: {emotionalState.Pleasure:F2}, Player nearby: {playerNearby}");
-            }
+            // if (shouldUse)
+            // {
+            //     Debug.Log($"{name}: Should use emotional actions - Arousal: {emotionalState.Arousal:F2}, Pleasure: {emotionalState.Pleasure:F2}, Player nearby: {playerNearby}");
+            // }
 
             return shouldUse;
         }
 
+
         // Helper method to check if player is nearby
+        
         private bool IsPlayerNearby()
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player == null) return false;
             
             float distance = Vector3.Distance(transform.position, player.transform.position);
-            float interactionRange = 10f; // You can make this configurable
+            
+            // Optional: Debug visualization
+            #if UNITY_EDITOR
+            Debug.DrawLine(transform.position, player.transform.position, 
+                distance <= interactionRange ? Color.green : Color.red);
+            #endif
             
             return distance <= interactionRange;
         }
@@ -420,7 +443,7 @@ namespace TL.Core
             }
         }
 
-        //action methods here
+        // action methods here
         public void DoWork(int duration)
         {
             StartCoroutine(WorkCoroutine(duration));
