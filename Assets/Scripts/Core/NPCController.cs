@@ -12,7 +12,7 @@ namespace TL.Core
         public AIBrain aiBrain { get; set; }
         public NPCInventory Inventory { get; set; }
         public Stats stats { get; set; }
-        public Context context { get; set; }  
+        public Context context { get; set; }
         public EmotionalState emotionalState { get; set; }
 
         [Header("Movement Settings")]
@@ -38,6 +38,8 @@ namespace TL.Core
         public bool isExecutingAction = false; 
 
         private NavMeshMoverWrapper _mover;
+
+        // What does this NavNesgWrapper do?
         public NavMeshMoverWrapper mover 
         { 
             get 
@@ -86,18 +88,18 @@ namespace TL.Core
                 agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
                 agent.avoidancePriority = 99;
                 
-                Debug.Log($"{name}: NavMeshAgent initialized - Speed: {agent.speed}");
+                // Debug.Log($"{name}: NavMeshAgent initialized - Speed: {agent.speed}");
                 
                 // Auto-warp to NavMesh if not properly positioned
                 if (!agent.isOnNavMesh)
                 {
-                    Debug.LogError($"{name}: NPC is NOT on NavMesh!");
+                    //Debug.LogError($"{name}: NPC is NOT on NavMesh!");
                     
-                    UnityEngine.AI.NavMeshHit hit;
+                    UnityEngine.AI.NavMeshHit hit; // what does this do?
                     if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out hit, 10f, UnityEngine.AI.NavMesh.AllAreas))
                     {
                         transform.position = hit.position;
-                        Debug.Log($"{name}: Auto-warped to NavMesh at {hit.position}");
+                        //Debug.Log($"{name}: Auto-warped to NavMesh at {hit.position}");
                     }
                 }
                 else
@@ -171,6 +173,13 @@ namespace TL.Core
             HandleAnimations();
         }
 
+        // This is where the differiation between emotional (active) and autommonus (passive) systems are decided
+        /* 
+            NPC Controller should almost differiate between when the two systems will be used:
+            - Active: When the player chooses to interacte with the NPC, NPC should stop, listen, do respond from players action.
+            - Passive: When the NPC is not interacting with the player doing what it needs to do automoiusly
+        */
+        
         public void FSMTick()
         {
             if (aiBrain == null)
@@ -184,6 +193,12 @@ namespace TL.Core
                 // The Emotional AI Brain should be listening for players response
                 // Interpret the action of the player
                 // Enter the Emotional Utility System 
+                // When player does interacts, the state is now listening to the player.
+                // maybe we need ShouldUseEmotionalActions() as a constant listening port to see if we need to go into
+                // emotional / interaction state 
+                // right now... player has to be in perfect timing for the decide state, however deciding can be instanteously?
+
+
     
             }
         
@@ -254,10 +269,10 @@ namespace TL.Core
                     agent.SetDestination(destination);
                     agent.isStopped = false;
                     
-                    Debug.Log($"{name}: NavMeshAgent destination set to: {destination}");
+                    //Debug.Log($"{name}: NavMeshAgent destination set to: {destination}");
                     
                     float distance = Vector3.Distance(destination, transform.position);
-                    Debug.Log($"{name}: Distance to target: {distance:F2}");
+                    //Debug.Log($"{name}: Distance to target: {distance:F2}");
                     
                     if (distance < agent.stoppingDistance + 0.5f)
                     {
@@ -349,6 +364,7 @@ namespace TL.Core
                 }
             }
         }
+
         // Helper method to determine when to use emotional actions
         private bool ShouldUseEmotionalActions()
         {

@@ -361,7 +361,7 @@ GameObject:
   - component: {fileID: 19830699}
   - component: {fileID: 19830698}
   m_Layer: 0
-  m_Name: EmotionNPC
+  m_Name: EmotionalNPC
   m_TagString: npc
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
