@@ -8,13 +8,23 @@ namespace TL.UtilityAI
     /*
     abstract class create the template of the class
     */
-    public abstract class Action : ScriptableObject
+    public abstract class Action : ScriptableObject, IAction
     {
         //Action is anything the NPC can physically do
-        public string Name;
-        private float _score; //how urgent the action is
+ 
+        [SerializeField] private string actionName; // Make it a private field
 
-        public float score 
+        private float _score; //how urgent the action is
+        
+        // Implement IAction.Name as a property so it can use IAction interface!
+
+        public string Name
+        {
+            get { return actionName; }
+            set { actionName = value; }
+        }
+
+        public float score
         {
             get { return _score; }
             set

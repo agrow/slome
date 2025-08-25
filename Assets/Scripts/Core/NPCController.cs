@@ -1,171 +1,143 @@
 using TL.UtilityAI;
-using Unity.VisualScripting;
+using TL.EmotionalAI;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 
 namespace TL.Core
 {
+    /// <summary>
+    /// NPCController implementation that uses EmotionBrain (new EmotionalAI system) and AIBrain.
+    /// Uses IAction interface for unified action handling.
+    /// </summary>
     public class NPCController : MonoBehaviour
     {
+        // Action States for AIBrain 
+        [Header("Action States")]
+        public bool isFlirting = false;
+        public bool isSocializing = false; 
+        public bool isWorking = false;
+        public bool isExecutingAction = false;
+
         [Header("AI Components")]
-        public AIBrain aiBrain { get; set; }
-        public NPCInventory Inventory { get; set; }
-        public Stats stats { get; set; }
-        public Context context { get; set; }
-        public EmotionalState emotionalState { get; set; }
+        public AIBrain aiBrain { get; private set; }
+        public EmotionBrain emotionBrain { get; private set; } // Use EmotionBrain, not EmotionalAIBrain
+        public EmotionModel emotionModel { get; private set; } // Add EmotionModel reference
+
+        [Header("Other Components")]
+        public NPCInventory Inventory { get; private set; }
+        public Stats stats { get; private set; }
+        public Context context { get; private set; }
+        public EmotionalState emotionalState { get; private set; }
+        public NavMeshAgent agent { get; private set; }
+        public Animator anim { get; private set; }
 
         [Header("Movement Settings")]
         public float speed = 3f;
-        
-        [Header("Visual Components")]
-        public Rigidbody rb;
-        public SpriteRenderer sr;
-        public Animator anim;
-        
-        [Header("Navigation")]
-        public NavMeshAgent agent;
-        [SerializeField, Range(1f, 20f)] // This creates a slider in the Inspector
+        [SerializeField, Range(1f, 20f)]
         private float interactionRange = 5f;
 
+        // State machine
+        public enum State { idle, move, execute, decide, active }
+        public State currentState { get; private set; }
 
-        [Header("Action States")]
-        public bool isFlirting = false;
-
-        public bool isSocializing = false; 
-        public bool isWorking = false;
-
-        public bool isExecutingAction = false; 
-
-        private NavMeshMoverWrapper _mover;
-
-        // What does this NavNesgWrapper do?
-        public NavMeshMoverWrapper mover 
-        { 
-            get 
-            {
-                if (_mover == null && agent != null)
-                {
-                    _mover = new NavMeshMoverWrapper(agent);
-                }
-                return _mover;
-            }
-        }
-
-        public enum State
-        {
-            idle,
-            move,
-            execute,
-            decide,
-            active
-        }
-        
+        private IAction currentAction;
         private Vector2 lastMove;
-        public State currentState { get; set; }
 
+
+    //purpose stmt: initialize NPC components,setup, enter decision making state machine
         void Start()
         {
             Debug.Log($"=== {name} NPC Starting Initialization ===");
+
+            // Initialize components
+            InitializeComponents();
+            
+            // Setup NavMesh
+            InitializeNavMesh();
+            
+            // Validate critical components
+            ValidateComponents();
             
             currentState = State.decide;
             
-            // Initialize visual components
-            if (rb == null) rb = GetComponent<Rigidbody>();
-            if (sr == null) sr = GetComponent<SpriteRenderer>();
-            if (anim == null) anim = GetComponent<Animator>();
-            
-            // Initialize NavMeshAgent
-            if (agent == null) agent = GetComponent<NavMeshAgent>();
+            Debug.Log($"{name}: Initialization complete. Starting in {currentState} state");
+        }
+
+        private void InitializeComponents()
+        {
+            aiBrain = GetComponent<AIBrain>();
+            emotionBrain = GetComponent<EmotionBrain>(); // Use EmotionBrain
+            emotionModel = GetComponent<EmotionModel>(); // Get EmotionModel
+            Inventory = GetComponent<NPCInventory>();
+            stats = GetComponent<Stats>();
+            context = FindAnyObjectByType<Context>();
+            emotionalState = GetComponent<EmotionalState>();
+            agent = GetComponent<NavMeshAgent>();
+            anim = GetComponent<Animator>();
+
+            // Get emotional state from stats if available
+            if (stats != null && emotionalState == null)
+            {
+                emotionalState = stats.GetEmotionalState();
+            }
+        }
+
+        private void InitializeNavMesh()
+        {
             if (agent != null)
             {
                 agent.speed = speed;
                 agent.stoppingDistance = 1f;
                 agent.angularSpeed = 360f;
                 agent.acceleration = 8f;
-                
-                // Prevent NPC from pushing player
                 agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
                 agent.avoidancePriority = 99;
-                
-                // Debug.Log($"{name}: NavMeshAgent initialized - Speed: {agent.speed}");
-                
-                // Auto-warp to NavMesh if not properly positioned
+
+                // Ensure agent is on NavMesh
                 if (!agent.isOnNavMesh)
                 {
-                    //Debug.LogError($"{name}: NPC is NOT on NavMesh!");
-                    
-                    UnityEngine.AI.NavMeshHit hit; // what does this do?
-                    if (UnityEngine.AI.NavMesh.SamplePosition(transform.position, out hit, 10f, UnityEngine.AI.NavMesh.AllAreas))
+                    NavMeshHit hit;
+                    if (NavMesh.SamplePosition(transform.position, out hit, 10f, NavMesh.AllAreas))
                     {
                         transform.position = hit.position;
-                        //Debug.Log($"{name}: Auto-warped to NavMesh at {hit.position}");
+                        Debug.Log($"{name}: Repositioned to NavMesh");
+                    }
+                    else
+                    {
+                        Debug.LogError($"{name}: Could not place on NavMesh!");
                     }
                 }
-                else
-                {
-                    Debug.Log($"{name}:  NavMeshAgent is properly on NavMesh!");
-                }
+            }
+        }
 
-                _mover = new NavMeshMoverWrapper(agent);
-            }
-            else
-            {
-                Debug.LogError($"{name}: CRITICAL - NavMeshAgent component missing!");
-            }
-            
-            // Get AI components
-            aiBrain = GetComponent<AIBrain>();
-            Inventory = GetComponent<NPCInventory>();
-            stats = GetComponent<Stats>();
-            
-            // Find Context in scene
-            if (context == null)
-            {
-                Context sceneContext = FindAnyObjectByType<Context>();
-                if (sceneContext != null)
-                {
-                    context = sceneContext;
-                    Debug.Log($"{name}: Found Context");
-                }
-                else
-                {
-                    Debug.LogWarning($"{name}: No Context found in scene!");
-                }
-            }
-            
-            // Get emotional state
-            if (stats != null)
-            {
-                emotionalState = stats.GetEmotionalState();
-            }
-            
-            // Check critical components
+        private void ValidateComponents()
+        {
             if (aiBrain == null)
-            {
-                Debug.LogError($"{name}: CRITICAL - AIBrain component missing!");
-                return;
-            }
+                Debug.LogWarning($"{name}: AIBrain component missing!");
+            
+            if (emotionBrain == null)
+                Debug.LogWarning($"{name}: EmotionBrain component missing!");
+            
+            if (emotionModel == null)
+                Debug.LogWarning($"{name}: EmotionModel component missing!");
             
             if (stats == null)
-            {
-                Debug.LogError($"{name}: CRITICAL - Stats component missing!");
-                return;
-            }
+                Debug.LogError($"{name}: Stats component missing!");
             
             if (agent == null)
-            {
-                Debug.LogError($"{name}: CRITICAL - NavMeshAgent component missing!");
-                return;
-            }
-            
-            Debug.Log($"{name}: Initial state: {currentState}");
-            Debug.Log($"=== {name} NPC Initialization Complete ===\n");
+                Debug.LogError($"{name}: NavMeshAgent component missing!");
         }
 
         void Update()
         {
             FSMTick();
+            
+            // Handle player interaction input (for emotional AI)
+            if (Input.GetKeyDown(KeyCode.T) && IsPlayerNearby())
+            {
+                TriggerEmotionalInteraction();
+            }
         }
 
         void LateUpdate()
@@ -173,232 +145,247 @@ namespace TL.Core
             HandleAnimations();
         }
 
-        // This is where the differiation between emotional (active) and autommonus (passive) systems are decided
-        /* 
-            NPC Controller should almost differiate between when the two systems will be used:
-            - Active: When the player chooses to interacte with the NPC, NPC should stop, listen, do respond from players action.
-            - Passive: When the NPC is not interacting with the player doing what it needs to do automoiusly
-        */
-        
+
+        // purpose stmt: Main state machine tick. Delegates to the correct brain based on ShouldUseEmotionalActions().
+  
         public void FSMTick()
         {
-            if (aiBrain == null)
+            bool useEmotional = ShouldUseEmotionalActions();
+
+            switch (currentState)
             {
-                Debug.LogError($"{name}: Cannot tick FSM - AIBrain is null!");
+                case State.decide: //second state init from start()
+                    HandleDecideState(useEmotional);
+                    break;
+                    
+                case State.move:
+                    HandleMoveState();
+                    break;
+                    
+                case State.execute:
+                    HandleExecuteState(useEmotional);
+                    break;
+                    
+                case State.active:
+                    HandleActiveState();
+                    break;
+                    
+                case State.idle:
+                    // Could add idle behavior here
+                    currentState = State.decide;
+                    break;
+            }
+        }
+
+        private void HandleDecideState(bool useEmotional)
+        {
+            Debug.Log($"\n--- {name}: DECIDE STATE ---");
+            
+            // Reset execution flag
+            isExecutingAction = false;
+            currentAction = null;
+
+            // Decide best action using the appropriate brain
+            if (useEmotional && emotionBrain != null)
+            {
+                Debug.Log($"{name}: Using EmotionBrain for decision");
+                emotionBrain.DecideBestEmotionalAction();
+                
+                // EmotionBrain uses TL.EmotionalAI.EmotionalAction, need to adapt to IAction
+                if (emotionBrain.bestAction != null)
+                {
+                    // Create a wrapper to make EmotionalAction work with IAction interface
+                    currentAction = new EmotionalActionWrapper(emotionBrain.bestAction);
+                }
+            }
+            else if (aiBrain != null)
+            {
+                Debug.Log($"{name}: Using AIBrain for decision");
+                aiBrain.DecideBestAction();
+                currentAction = aiBrain.bestAction; // Regular Action already implements IAction
+            }
+
+            if (currentAction == null)
+            {
+                Debug.LogWarning($"{name}: No action decided, staying in decide state");
                 return;
             }
 
-            if (currentState == State.active)
-            {
-                // The Emotional AI Brain should be listening for players response
-                // Interpret the action of the player
-                // Enter the Emotional Utility System 
-                // When player does interacts, the state is now listening to the player.
-                // maybe we need ShouldUseEmotionalActions() as a constant listening port to see if we need to go into
-                // emotional / interaction state 
-                // right now... player has to be in perfect timing for the decide state, however deciding can be instanteously?
+            Debug.Log($"{name}: Selected action: {currentAction.Name}");
 
+            // Set required destination for the action
+            currentAction.SetRequiredDestination(this);
+            Transform targetDestination = currentAction.RequiredDestination;
 
-    
-            }
-        
-            if (currentState == State.decide)
+            if (targetDestination == null)
             {
-                Debug.Log($"\n--- {name}: DECIDE STATE ---");
-                Debug.Log($"{name}: Stats - Energy: {stats?.energy ?? -1}, Hunger: {stats?.hunger ?? -1}, Money: {stats?.money ?? -1}");
-                
-                // Check if we should use emotional actions instead of regular actions
-                EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
-                bool useEmotionalAction = false;
-                EmotionalAction selectedEmotionalAction = null;
-        
-                if (emotionalBrain != null && ShouldUseEmotionalActions())
-                {
-                    Debug.Log($"{name}: Using EmotionalAIBrain for decision making");
-                    emotionalBrain.DecideBestEmotionalAction(this);
-                    
-                    if (emotionalBrain.bestEmotionalAction != null)
-                    {
-                        selectedEmotionalAction = emotionalBrain.bestEmotionalAction;
-                        useEmotionalAction = true;
-                        Debug.Log($"{name}: Selected emotional action: {selectedEmotionalAction.Name} (score: {selectedEmotionalAction.score})");
-                    }
-                }
-                
-                // If no emotional action was selected, use regular AI decision making
-                if (!useEmotionalAction)
-                {
-                    Debug.Log($"{name}: Using regular AIBrain for decision making");
-                    aiBrain.DecideBestAction();
-                    
-                    if (aiBrain.bestAction == null)
-                    {
-                        Debug.LogError($"{name}: No best action found!");
-                        return;
-                    }
-                    
-                    Debug.Log($"{name}: Best action: {aiBrain.bestAction.Name} (score: {aiBrain.bestAction.score})");
-                }
-                
-                // Set destination based on action type
-                Transform targetDestination = null;
-                string actionName = "";
-                
-                if (useEmotionalAction)
-                {
-                    selectedEmotionalAction.SetRequiredDestination(this);
-                    targetDestination = selectedEmotionalAction.RequiredDestination;
-                    actionName = selectedEmotionalAction.Name;
-                }
-                else
-                {
-                    aiBrain.bestAction.SetRequiredDestination(this);
-                    targetDestination = aiBrain.bestAction.RequiredDestination;
-                    actionName = aiBrain.bestAction.Name;
-                }
-                
-                if (targetDestination == null)
-                {
-                    Debug.LogError($"{name}: No destination set for action {actionName}!");
-                    return;
-                }
-                
-                if (agent != null)
-                {
-                    Vector3 destination = targetDestination.position;
-                    agent.SetDestination(destination);
-                    agent.isStopped = false;
-                    
-                    //Debug.Log($"{name}: NavMeshAgent destination set to: {destination}");
-                    
-                    float distance = Vector3.Distance(destination, transform.position);
-                    //Debug.Log($"{name}: Distance to target: {distance:F2}");
-                    
-                    if (distance < agent.stoppingDistance + 0.5f)
-                    {
-                        currentState = State.execute;
-                        Debug.Log($"{name}: Close enough, switching to EXECUTE");
-                    }
-                    else
-                    {
-                        currentState = State.move;
-                        Debug.Log($"{name}: Moving to destination");
-                    }
-                }
+                Debug.LogError($"{name}: No destination set for action {currentAction.Name}");
+                return;
             }
-            else if (currentState == State.move)
+
+            if (agent == null)
             {
-                if (agent != null)
-                {
-                    float remainingDistance = agent.remainingDistance;
-                    
-                    if (!agent.pathPending && remainingDistance < agent.stoppingDistance + 0.5f)
-                    {
-                        currentState = State.execute;
-                        agent.isStopped = true;
-                        Debug.Log($"{name}: Reached destination! Switching to EXECUTE");
-                    }
-                }
+                Debug.LogError($"{name}: NavMeshAgent is null!");
+                return;
             }
-            else if (currentState == State.execute)
+
+            // Move towards destination
+            agent.SetDestination(targetDestination.position);
+            agent.isStopped = false;
+
+            float distance = Vector3.Distance(targetDestination.position, transform.position);
+
+            // Transition to move or execute based on distance
+            if (distance < agent.stoppingDistance + 0.5f)
             {
-                // Check if we're executing an emotional action
-                EmotionalAIBrain emotionalBrain = GetComponent<EmotionalAIBrain>();
-                bool isEmotionalAction = emotionalBrain != null && 
-                                        emotionalBrain.bestEmotionalAction != null;
-                
-                if (isEmotionalAction)
+                currentState = State.execute;
+                Debug.Log($"{name}: Close to target, going to EXECUTE");
+            }
+            else
+            {
+                currentState = State.move;
+                Debug.Log($"{name}: Moving to target, going to MOVE");
+            }
+        }
+        // purpose stmt: monitors the navmeshagent movement and transitions to execute when reaches destination
+        private void HandleMoveState()
+        {
+            if (agent != null && !agent.pathPending)
+            {
+                if (agent.remainingDistance < agent.stoppingDistance + 0.5f)
                 {
-                    // Handle emotional action execution - ONLY execute once
-                    if (!isExecutingAction)
-                    {
-                        Debug.Log($"{name}: Starting emotional action: {emotionalBrain.bestEmotionalAction.Name}");
-                        isExecutingAction = true;
-                        emotionalBrain.finishedExecutingBestEmotionalAction = false; // Ensure it's false
-                        emotionalBrain.bestEmotionalAction.Execute(this);
-                    }
-                    
-                    // Wait for emotional action coroutine to signal completion
-                    if (emotionalBrain.finishedExecutingBestEmotionalAction)
-                    {
-                        if (agent != null)
-                        {
-                            agent.isStopped = false;
-                        }
-                        
-                        // Reset emotional brain state
-                        isExecutingAction = false;
-                        emotionalBrain.finishedExecutingBestEmotionalAction = false;
-                        emotionalBrain.bestEmotionalAction = null;
-                        
-                        currentState = State.decide;
-                        Debug.Log($"{name}: Finished executing emotional action, returning to DECIDE");
-                    }
-                }
-                else
-                {
-                    // Handle regular action execution - ONLY execute once
-                    if (!isExecutingAction)
-                    {
-                        Debug.Log($"{name}: Starting regular action: {aiBrain.bestAction.Name}");
-                        isExecutingAction = true;
-                        aiBrain.finishedExecutingBestAction = false; // Ensure it's false
-                        aiBrain.bestAction.Execute(this);
-                    }
-                    
-                    // Wait for regular action coroutine to signal completion
-                    if (aiBrain.finishedExecutingBestAction)
-                    {
-                        if (agent != null)
-                        {
-                            agent.isStopped = false;
-                        }
-                        
-                        // Reset regular brain state
-                        isExecutingAction = false;
-                        aiBrain.finishedExecutingBestAction = false;
-                        
-                        currentState = State.decide;
-                        Debug.Log($"{name}: Finished executing regular action, returning to DECIDE");
-                    }
+                    currentState = State.execute;
+                    agent.isStopped = true;
+                    Debug.Log($"{name}: Reached destination, going to EXECUTE");
                 }
             }
         }
+        //purpose stmt: executes selected action (emotional or utility) and monitors completion flags to return to decide state
+        private void HandleExecuteState(bool useEmotional)
+        {
+            if (currentAction == null)
+            {
+                Debug.LogWarning($"{name}: No current action to execute");
+                currentState = State.decide;
+                return;
+            }
 
-        // Helper method to determine when to use emotional actions
+            // Only execute once
+            if (!isExecutingAction)
+            {
+                Debug.Log($"{name}: Executing action: {currentAction.Name}");
+                isExecutingAction = true;
+                
+                // Reset completion flags
+                if (useEmotional && emotionBrain != null)
+                {
+                    emotionBrain.finishedExecutingBestAction = false;
+                }
+                else if (aiBrain != null)
+                {
+                    aiBrain.finishedExecutingBestAction = false;
+                }
+                
+                // Execute the action
+                currentAction.Execute(this);
+            }
+            
+            // Check if action is finished
+            bool actionFinished = false;
+            if (useEmotional && emotionBrain != null)
+            {
+                actionFinished = emotionBrain.finishedExecutingBestAction;
+            }
+            else if (aiBrain != null)
+            {
+                actionFinished = aiBrain.finishedExecutingBestAction;
+            }
+            
+            if (actionFinished)
+            {
+                Debug.Log($"{name}: Action {currentAction.Name} completed");
+                
+                // Reset states and go back to decide :p
+                isExecutingAction = false;
+                currentAction = null;
+                if (agent != null) agent.isStopped = false;
+                currentState = State.decide;
+            }
+        }
+        // manages active state for special behaviors like player interaction before returning to normal AI decision making 
+    //aka, the controller should always be prioritizing player interaction 
+        private void HandleActiveState()
+        {
+            // Active state for player interaction
+            // Return to decide when interaction is complete
+            if (!isExecutingAction)
+            {
+                currentState = State.decide;
+            }
+        }
+
+        /// <summary>
+        /// Determines if emotional actions should be used.
+        /// </summary>
         private bool ShouldUseEmotionalActions()
         {
-            bool shouldUse = false;
-            // if player pressed T next to the NPC, it means the player intends to interact with you
-            if (Input.GetKeyDown(KeyCode.T) && IsPlayerNearby())
+            // Use emotional actions if:
+            // 1. Player is nearby
+            // 2. NPC is in an emotional state
+            // 3. Specific triggers are met
+            
+            if (IsPlayerNearby() && emotionalState != null)
             {
-                Debug.Log($"{name}: Player pressed T, so we should use emotional actions");
-                shouldUse = true;
-            }         
-            // if (emotionalState == null) return false;
-
-            // Use emotional actions when:
-            // 1. High arousal (excited/passionate state)
-            // 2. High pleasure (happy/positive state)  
-            // 3. Player is nearby (social opportunity)
-
-            // bool highArousal = emotionalState.Arousal > 0.0f;
-            // bool highPleasure = emotionalState.Pleasure > 0.0f;
-            // bool playerNearby = IsPlayerNearby();
-
-            // bool shouldUse = highArousal || highPleasure || playerNearby;
-
-            // if (shouldUse)
-            // {
-            //     Debug.Log($"{name}: Should use emotional actions - Arousal: {emotionalState.Arousal:F2}, Pleasure: {emotionalState.Pleasure:F2}, Player nearby: {playerNearby}");
-            // }
-
-            return shouldUse;
+                // Example: Use emotional actions if pleasure or arousal is high/low
+                float pleasure = emotionalState.Pleasure;
+                float arousal = emotionalState.Arousal;
+                
+                // Use emotional actions if values are extreme (very high or very low)
+                return (pleasure > 0.8f || pleasure < 0.2f || arousal > 0.8f || arousal < 0.2f);
+            }
+            
+            return false;
         }
 
+        private void TriggerEmotionalInteraction()
+        {
+            if (emotionBrain != null && emotionModel != null)
+            {
+                Debug.Log($"{name}: Player triggered emotional interaction");
+                
+                // Apply a player action to update the emotional model
+                PlayerAction[] demoActions = { 
+                    PlayerAction.Flirt, 
+                    PlayerAction.ComplimentLooks, 
+                    PlayerAction.Hug,
+                    PlayerAction.TeasePlayful
+                };
+                
+                PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)];
+                emotionModel.ApplyPlayerAction(selectedAction, 1.0f);
+                
+                Debug.Log($"{name}: Applied player action: {selectedAction}");
+                Debug.Log($"{name}: New PAD: P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");
+                Debug.Log($"{name}: Emotion: {emotionModel.lastEmotion}");
+                
+                currentState = State.active;
+                isExecutingAction = true;
+                
+                // Force emotional brain to decide and execute
+                emotionBrain.DecideBestEmotionalAction();
+                if (emotionBrain.bestAction != null)
+                {
+                    Debug.Log($"{name}: Emotional response: {emotionBrain.bestAction.Name}");
+                    emotionBrain.ExecuteBest();
+                }
+                else
+                {
+                    Debug.Log($"{name}: No emotional action available");
+                    isExecutingAction = false;
+                }
+            }
+        }
 
-        // Helper method to check if player is nearby
-        
         private bool IsPlayerNearby()
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -406,7 +393,6 @@ namespace TL.Core
             
             float distance = Vector3.Distance(transform.position, player.transform.position);
             
-            // Optional: Debug visualization
             #if UNITY_EDITOR
             Debug.DrawLine(transform.position, player.transform.position, 
                 distance <= interactionRange ? Color.green : Color.red);
@@ -418,6 +404,7 @@ namespace TL.Core
         private void HandleAnimations()
         {
             if (anim == null || agent == null) return;
+            
             Camera cam = Camera.main;
             if (cam == null) return;
 
@@ -426,13 +413,11 @@ namespace TL.Core
 
             if (!isMoving && currentState == State.move)
             {
-                // Fallback: check velocity magnitude
                 isMoving = agent.velocity.magnitude > 0.05f;
             }
 
             if (isMoving)
             {
-                //  Tell animator we're moving
                 anim.SetBool("isMoving", true);
 
                 Vector3 velocity = agent.velocity;
@@ -441,17 +426,14 @@ namespace TL.Core
                     lastMove = new Vector2(velocity.x, velocity.z).normalized;
                 }
 
-                // Convert world-space to camera-relative direction
                 Vector3 worldSpaceMovement = new Vector3(lastMove.x, 0, lastMove.y);
                 Vector3 cameraRelativeMovement = cam.transform.InverseTransformDirection(worldSpaceMovement);
 
-                // Update blend tree parameters
                 anim.SetFloat("lastMoveX", cameraRelativeMovement.x);
                 anim.SetFloat("lastMoveY", cameraRelativeMovement.z);
             }
             else
             {
-                //  Idle: stop walking, but keep last facing direction
                 anim.SetBool("isMoving", false);
 
                 Vector3 worldSpaceLastMove = new Vector3(lastMove.x, 0, lastMove.y);
@@ -462,7 +444,8 @@ namespace TL.Core
             }
         }
 
-        // action methods here
+        // ========== ACTION METHODS (for regular AI actions) ==========
+
         public void DoWork(int duration)
         {
             StartCoroutine(WorkCoroutine(duration));
@@ -484,12 +467,12 @@ namespace TL.Core
             }
             
             isWorking = false;
-            aiBrain.finishedExecutingBestAction = true;
+            if (aiBrain != null)
+                aiBrain.finishedExecutingBestAction = true;
         }
 
         public void DoSleep(int duration)
         {
-            Debug.Log($"{name}: DoSleep called - Duration: {duration} seconds");
             StartCoroutine(SleepCoroutine(duration));
         }
 
@@ -516,37 +499,73 @@ namespace TL.Core
                 anim.SetBool("isSleeping", false);
             }
             
-            aiBrain.finishedExecutingBestAction = true;
+            if (aiBrain != null)
+                aiBrain.finishedExecutingBestAction = true;
+        }
+
+        // ========== DEBUG METHODS ==========
+
+        public void LogCurrentState()
+        {
+            Debug.Log($"{name}: State={currentState}, Action={currentAction?.Name ?? "None"}, Executing={isExecutingAction}");
+            
+            if (emotionalState != null)
+            {
+                Debug.Log($"{name}: PAD - P={emotionalState.Pleasure:F2}, A={emotionalState.Arousal:F2}, D={emotionalState.Dominance:F2}");
+            }
+            
+            if (emotionModel != null)
+            {
+                Debug.Log($"{name}: EmotionModel PAD - P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");
+                Debug.Log($"{name}: Last Emotion: {emotionModel.lastEmotion}");
+            }
         }
     }
 
-    [System.Serializable]
-    public class NavMeshMoverWrapper
+    /// <summary>
+    /// IAction interface for unified action handling.
+    /// Both regular actions and emotional actions should implement this.
+    /// </summary>
+    public interface IAction 
     {
-        private NavMeshAgent agent;
+        string Name { get; }
+        Transform RequiredDestination { get; }
+        void SetRequiredDestination(NPCController npc);
+        void Execute(NPCController npc);
+    }
+
+    /// <summary>
+    /// Wrapper to make TL.EmotionalAI.EmotionalAction work with IAction interface.
+    /// </summary>
+    public class EmotionalActionWrapper : IAction
+    {
+        private EmotionalAction emotionalAction;
         
-        public NavMeshMoverWrapper(NavMeshAgent navAgent)
+        public EmotionalActionWrapper(EmotionalAction action)
         {
-            agent = navAgent;
+            emotionalAction = action;
         }
-        
-        public Transform destination 
-        { 
-            get { return null; }
-            set 
-            { 
-                if (agent != null && value != null)
+
+        public string Name => emotionalAction.Name;
+        public Transform RequiredDestination { get; private set; }
+
+        public void SetRequiredDestination(NPCController npc)
+        {
+            // For emotional actions, typically don't need to move - stay near player
+            RequiredDestination = npc.transform;
+        }
+
+        public void Execute(NPCController npc)
+        {
+            // Execute the emotional action using EmotionModel and Animator
+            if (npc.emotionModel != null)
+            {
+                emotionalAction.Execute(npc.emotionModel, npc.anim);
+                
+                // Signal completion to EmotionBrain
+                if (npc.emotionBrain != null)
                 {
-                    agent.SetDestination(value.position);
-                    Debug.Log($"NavMeshMoverWrapper: Setting destination to {value.position}");
-                }
-                else if (agent == null)
-                {
-                    Debug.LogError("NavMeshMoverWrapper: NavMeshAgent is null!");
-                }
-                else if (value == null)
-                {
-                    Debug.LogError("NavMeshMoverWrapper: Destination transform is null!");
+                    npc.emotionBrain.finishedExecutingBestAction = true;
                 }
             }
         }

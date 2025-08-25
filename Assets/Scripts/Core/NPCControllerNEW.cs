@@ -1,7 +1,10 @@
+/*
+
 using TL.UtilityAI;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+
 
 namespace TL.Core
 {
@@ -9,7 +12,7 @@ namespace TL.Core
     /// New NPCController implementation that clearly separates handling of EmotionalAIBrain and AIBrain.
     /// Uses IAction interface for unified action handling.
     /// </summary>
-    public class NPCControllerNEW : MonoBehaviour
+    public class NPCController : MonoBehaviour
     {
         // AI brains
         public AIBrain aiBrain { get; private set; }
@@ -82,7 +85,7 @@ namespace TL.Core
                 agent.isStopped = false;
 
                 float distance = Vector3.Distance(targetDestination.position, transform.position);
-                
+
                 // Transition to move or execute based on distance
                 if (distance < agent.stoppingDistance + 0.5f)
                     // if we don't need to move, go straight to execute
@@ -134,8 +137,8 @@ namespace TL.Core
     {
         string Name { get; }
         Transform RequiredDestination { get; }
-        void SetRequiredDestination(NPCControllerNEW npc);
-        void Execute(NPCControllerNEW npc);
+        void SetRequiredDestination(NPCController npc);
+        void Execute(NPCController npc);
     }
 
     /// <summary>
@@ -144,12 +147,13 @@ namespace TL.Core
     public class AIBrain : MonoBehaviour
     {
         public IAction DecideBestAction() { return null; }
-        public void ExecuteAction(IAction action, NPCControllerNEW npc) { }
+        public void ExecuteAction(IAction action, NPCController npc) { }
     }
 
     public class EmotionalAIBrain : MonoBehaviour
     {
         public IAction DecideBestAction() { return null; }
-        public void ExecuteAction(IAction action, NPCControllerNEW npc) { }
+        public void ExecuteAction(IAction action, NPCController npc) { }
     }
 }
+*/

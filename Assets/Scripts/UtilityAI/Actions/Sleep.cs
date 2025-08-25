@@ -11,16 +11,27 @@ namespace TL.UtilityAI.Actions
     {
         public override void Execute(NPCController npc)
         {
-            // Dependacy Injection: your class doesn't have a local refernence to an GameObject, but you can still require it. 
+            Debug.Log($"{npc.name}: Executing Sleep action");
+            // Dependency Injection: your class doesn't have a local reference to a GameObject, but you can still require it.
             npc.DoSleep(3);
         }
 
         public override void SetRequiredDestination(NPCController npc)
         {
-           RequiredDestination = npc.context.home.transform; // only one home right now in the game.
-           npc.mover.destination = RequiredDestination;
+            if (npc.context != null && npc.context.home != null)
+            {
+                RequiredDestination = npc.context.home.transform; // only one home right now in the game.
+                Debug.Log($"{npc.name}: Sleep destination set to home: {RequiredDestination.name}");
+            }
+            else
+            {
+                // Fallback: stay in place if no home found
+                RequiredDestination = npc.transform;
+                Debug.LogWarning($"{npc.name}: No home found in context, staying in place for sleep");
+            }
+            
+            // Note: The NPCController FSM will handle agent.SetDestination() in HandleDecideState()
+            // We don't need to set npc.mover.destination anymore
         }
     }
-
-    
 }
