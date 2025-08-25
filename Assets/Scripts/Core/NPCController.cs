@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 using Unity.VisualScripting;
+using UnityEngine.InputSystem;
 
 namespace TL.Core
 {
@@ -35,6 +36,8 @@ namespace TL.Core
         public EmotionalState emotionalState { get; private set; }
         public NavMeshAgent agent { get; private set; }
         public Animator anim { get; private set; }
+
+        public PlayerInputManager playerInputManager  { get; private set; }
 
         [Header("Movement Settings")]
         public float speed = 3f;
@@ -75,6 +78,7 @@ namespace TL.Core
         private void InitializeComponents()
         {
             aiBrain = GetComponent<AIBrain>();
+            playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<PlayerInputManager>();;
             emotionBrain = GetComponent<EmotionBrain>();
             emotionModel = GetComponent<EmotionModel>();
             Inventory = GetComponent<NPCInventory>();
@@ -123,18 +127,20 @@ namespace TL.Core
         {
             if (aiBrain == null)
                 Debug.LogWarning($"{name}: AIBrain component missing!");
-            
+
             if (emotionBrain == null)
                 Debug.LogWarning($"{name}: EmotionBrain component missing!");
-            
+
             if (emotionModel == null)
                 Debug.LogWarning($"{name}: EmotionModel component missing!");
-            
+
             if (stats == null)
                 Debug.LogError($"{name}: Stats component missing!");
-            
+
             if (agent == null)
                 Debug.LogError($"{name}: NavMeshAgent component missing!");
+            if (playerInputManager == null)
+                Debug.LogError($"{name}: PlayerInputManager component missing!");
         }
 
         void Update()
@@ -189,7 +195,7 @@ namespace TL.Core
             {
                 Debug.Log($"{name}: Using EmotionBrain (responding to T press)");
                 emotionBrain.DecideBestEmotionalAction();
-                
+
                 if (emotionBrain.bestAction != null)
                 {
                     currentAction = new EmotionalActionWrapper(emotionBrain.bestAction);
@@ -286,11 +292,12 @@ namespace TL.Core
             {
                 Debug.Log($"{name}: Executing action: {currentAction.Name}");
                 isExecutingAction = true;
-                
+
                 // Reset completion flags
                 if (useEmotional && emotionBrain != null)
                 {
                     emotionBrain.finishedExecutingBestAction = false;
+                    playerInputManager.EmotionalTriggered = false; // Reset the flag after triggering
                 }
                 else if (aiBrain != null)
                 {
@@ -320,18 +327,21 @@ namespace TL.Core
                 isExecutingAction = false;
                 currentAction = null;
                 if (agent != null) agent.isStopped = false;
-                
-                // Choose next state based on action type
-                if (useEmotional)
-                {
-                    Debug.Log($"{name}: Emotional action finished - going to IDLE");
-                    currentState = State.idle; // Go to idle after emotional action
-                }
-                else
-                {
-                    Debug.Log($"{name}: Utility action finished - going to DECIDE");
-                    currentState = State.decide; // Go directly to decide for utility actions
-                }
+                currentState = State.decide;
+
+                // // Choose next state based on action type
+                // if (useEmotional)
+                // {
+                //     Debug.Log($"{name}: Emotional action finished - going to IDLE");
+                //     currentState = State.idle; // Go to idle after emotional action
+                //     playerInputManager.EmotionalTriggered = false; // Reset the flag after triggering
+
+                // }
+                // else
+                // {
+                //     Debug.Log($"{name}: Utility action finished - going to DECIDE");
+                //     currentState = State.decide; // Go directly to decide for utility actions
+                // }
             }
         }
 
@@ -368,54 +378,36 @@ namespace TL.Core
          */
         private bool ShouldUseEmotionalActions()
         {
-            // Check if we've had a recent T press
-            float timeSinceLastTrigger = Time.time - lastEmotionalTrigger;
-            
-            // Don't use emotional actions if:
-            // 1. No recent T press (older than timeout)
-            // 2. Already responded to current T press
-            if (timeSinceLastTrigger > emotionalTimeout || hasRespondedToCurrentTrigger)
-            {
-                return false; // Return to utility AI
-            }
-
-            
-            
-            // Only use emotional actions if:
-            // 1. Recent T press (within timeout)
-            // 2. Haven't responded yet
-            // 3. Player is nearby
-            return IsPlayerNearby();
+            return IsPlayerNearby() && playerInputManager.EmotionalTriggered;
         }
 
-        public void TriggerEmotionalInteraction()
+        public void TriggerEmotionalInteraction(PlayerAction action)
         {
             if (emotionBrain != null && emotionModel != null)
             {
                 Debug.Log($"{name}: Player triggered emotional interaction");
-                
+
                 // Update timestamps and flags
                 lastEmotionalTrigger = Time.time;
                 hasRespondedToCurrentTrigger = false; // Reset for new T press
-                
+
                 // Apply a player action to update the emotional model
-                PlayerAction[] demoActions = { 
-                    PlayerAction.Flirt, 
-                    PlayerAction.ComplimentLooks, 
-                    PlayerAction.Hug, 
+                PlayerAction[] demoActions = {
+                    PlayerAction.Flirt,
+                    PlayerAction.ComplimentLooks,
+                    PlayerAction.Hug,
                     PlayerAction.TeasePlayful
                 };
-                
-                PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)];
-                emotionModel.ApplyPlayerAction(selectedAction, 1.0f);
-                
-                Debug.Log($"{name}: Applied player action: {selectedAction}");
+
+                //PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)];
+                emotionModel.ApplyPlayerAction(action, 1.0f);
+
+                Debug.Log($"{name}: Applied player action: {action}");
                 Debug.Log($"{name}: New PAD: P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");
                 Debug.Log($"{name}: Emotion: {emotionModel.lastEmotion}");
-                
+
                 // Go to decide state - let FSM handle the response properly
-                currentState = State.decide;
-                
+                currentState = State.decide;                
                 // REMOVED: Manual execution - let the state machine handle it
             }
         }

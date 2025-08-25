@@ -339,6 +339,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15dea9a53a5cea443923fd5622ad5681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerUICanvas: {fileID: 0}
+  output: {fileID: 0}
+  playerInput: {fileID: 0}
 --- !u!1 &19830697
 GameObject:
   m_ObjectHideFlags: 0
@@ -360,6 +363,7 @@ GameObject:
   - component: {fileID: 19830699}
   - component: {fileID: 19830698}
   - component: {fileID: 19830711}
+  - component: {fileID: 19830712}
   m_Layer: 0
   m_Name: EmotionalNPC
   m_TagString: npc
@@ -618,6 +622,23 @@ MonoBehaviour:
   isExecutingAction: 0
   speed: 3
   interactionRange: 5
+  emotionalTimeout: 2
+  hasRespondedToCurrentTrigger: 0
+--- !u!114 &19830712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 19830697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15dea9a53a5cea443923fd5622ad5681, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerUICanvas: {fileID: 1847818916}
+  output: {fileID: 385713233}
+  playerInput: {fileID: 1423955280}
 --- !u!1 &303976993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1559,8 +1580,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 888330744}
-        m_TargetAssemblyTypeName: PlayerCommands, Assembly-CSharp
-        m_MethodName: parseInput
+        m_TargetAssemblyTypeName: PlayerInputManager, Assembly-CSharp
+        m_MethodName: ParseInput
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1728,12 +1749,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 888330742}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2876675dfcf784346b960739c56f7b4f, type: 3}
+  m_Script: {fileID: 11500000, guid: 15dea9a53a5cea443923fd5622ad5681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerUICanvas: {fileID: 1847818916}
   output: {fileID: 385713233}
   playerInput: {fileID: 1423955280}
-  player: {fileID: 0}
 --- !u!1 &1017018164
 GameObject:
   m_ObjectHideFlags: 0
