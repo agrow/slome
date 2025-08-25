@@ -25,8 +25,8 @@ namespace TL.Core
 
         [Header("AI Components")]
         public AIBrain aiBrain { get; private set; }
-        public EmotionBrain emotionBrain { get; private set; } // Use EmotionBrain, not EmotionalAIBrain
-        public EmotionModel emotionModel { get; private set; } // Add EmotionModel reference
+        public EmotionBrain emotionBrain { get; private set; }
+        public EmotionModel emotionModel { get; private set; }
 
         [Header("Other Components")]
         public NPCInventory Inventory { get; private set; }
@@ -41,16 +41,19 @@ namespace TL.Core
         [SerializeField, Range(1f, 20f)]
         private float interactionRange = 5f;
 
+        [Header("Emotional AI Settings")]
+        [SerializeField] private float emotionalTimeout = 2f; // Time for one emotional response
+        private float lastEmotionalTrigger = -999f; // When T was last pressed
+        public bool hasRespondedToCurrentTrigger = false; // Prevent multiple responses per T press
+
         // State machine
-        public enum State { idle, move, execute, decide, active }
+        public enum State { idle, move, execute, decide }
         public State currentState { get; private set; }
 
         private IAction currentAction;
         private Vector2 lastMove;
 
-
-
-    //purpose stmt: initialize NPC components,setup, enter decision making state machine
+        //purpose stmt: initialize NPC components,setup, enter decision making state machine
         void Start()
         {
             Debug.Log($"=== {name} NPC Starting Initialization ===");
@@ -63,8 +66,6 @@ namespace TL.Core
             
             // Validate critical components
             ValidateComponents();
-
-            
             
             currentState = State.decide;
             
@@ -74,8 +75,8 @@ namespace TL.Core
         private void InitializeComponents()
         {
             aiBrain = GetComponent<AIBrain>();
-            emotionBrain = GetComponent<EmotionBrain>(); // Use EmotionBrain
-            emotionModel = GetComponent<EmotionModel>(); // Get EmotionModel
+            emotionBrain = GetComponent<EmotionBrain>();
+            emotionModel = GetComponent<EmotionModel>();
             Inventory = GetComponent<NPCInventory>();
             stats = GetComponent<Stats>();
             context = FindAnyObjectByType<Context>();
@@ -135,15 +136,10 @@ namespace TL.Core
             if (agent == null)
                 Debug.LogError($"{name}: NavMeshAgent component missing!");
         }
-        
-
 
         void Update()
         {
-
             FSMTick();
-            
-            
         }
 
         void LateUpdate()
@@ -151,16 +147,14 @@ namespace TL.Core
             HandleAnimations();
         }
 
-
         // purpose stmt: Main state machine tick. Delegates to the correct brain based on ShouldUseEmotionalActions().
-  
         public void FSMTick()
         {
             bool useEmotional = ShouldUseEmotionalActions();
 
             switch (currentState)
             {
-                case State.decide: //second state init from start()
+                case State.decide:
                     HandleDecideState(useEmotional);
                     break;
                     
@@ -172,22 +166,20 @@ namespace TL.Core
                     HandleExecuteState(useEmotional);
                     break;
                     
-                case State.active:
-                    HandleActiveState();
-                    break;
-                    
                 case State.idle:
-                    // Could add idle behavior here
-                    currentState = State.decide;
+                    HandleIdleState();
                     break;
             }
         }
-
-    // --------- DECIDE STATE ---------
+        //purpose stmt: deciding what best actions to take based on the current brain, 
         private void HandleDecideState(bool useEmotional)
         {
             Debug.Log($"\n--- {name}: DECIDE STATE ---");
-
+            
+            // Add debug info for emotional state
+            float timeSinceLastTrigger = Time.time - lastEmotionalTrigger;
+            Debug.Log($"{name}: Time since T press: {timeSinceLastTrigger:F1}s, Responded: {hasRespondedToCurrentTrigger}");
+            
             // Reset execution flag
             isExecutingAction = false;
             currentAction = null;
@@ -195,21 +187,31 @@ namespace TL.Core
             // Decide best action using the appropriate brain
             if (useEmotional && emotionBrain != null)
             {
-                Debug.Log($"{name}: Using EmotionBrain for decision");
+                Debug.Log($"{name}: Using EmotionBrain (responding to T press)");
                 emotionBrain.DecideBestEmotionalAction();
-
-                // EmotionBrain uses TL.EmotionalAI.EmotionalAction, need to adapt to IAction
+                
                 if (emotionBrain.bestAction != null)
                 {
-                    // Create a wrapper to make EmotionalAction work with IAction interface
                     currentAction = new EmotionalActionWrapper(emotionBrain.bestAction);
                 }
             }
             else if (aiBrain != null)
             {
-                Debug.Log($"{name}: Using AIBrain for decision");
+                if (hasRespondedToCurrentTrigger)
+                {
+                    Debug.Log($"{name}: Using AIBrain (already responded to T press - back to utility AI)");
+                }
+                else if (timeSinceLastTrigger > emotionalTimeout)
+                {
+                    Debug.Log($"{name}: Using AIBrain (T press timeout - back to utility AI)");
+                }
+                else
+                {
+                    Debug.Log($"{name}: Using AIBrain (no emotional trigger)");
+                }
+                
                 aiBrain.DecideBestAction();
-                currentAction = aiBrain.bestAction; // Regular Action already implements IAction
+                currentAction = aiBrain.bestAction;
             }
 
             if (currentAction == null)
@@ -255,7 +257,6 @@ namespace TL.Core
             }
         }
 
-        // --------- MOVE STATE ---------
         // purpose stmt: monitors the navmeshagent movement and transitions to execute when reaches destination
         private void HandleMoveState()
         {
@@ -269,7 +270,7 @@ namespace TL.Core
                 }
             }
         }
-        // --------- EXECUTE STATE ---------
+
         //purpose stmt: executes selected action (emotional or utility) and monitors completion flags to return to decide state
         private void HandleExecuteState(bool useEmotional)
         {
@@ -279,12 +280,13 @@ namespace TL.Core
                 currentState = State.decide;
                 return;
             }
+
             // Only execute once
             if (!isExecutingAction)
             {
                 Debug.Log($"{name}: Executing action: {currentAction.Name}");
                 isExecutingAction = true;
-
+                
                 // Reset completion flags
                 if (useEmotional && emotionBrain != null)
                 {
@@ -294,12 +296,12 @@ namespace TL.Core
                 {
                     aiBrain.finishedExecutingBestAction = false;
                 }
-
+                
                 // Execute the action
                 currentAction.Execute(this);
             }
-
-            // Listens/Check if action is finished / true
+            
+            // Check if action is finished
             bool actionFinished = false;
             if (useEmotional && emotionBrain != null)
             {
@@ -309,56 +311,81 @@ namespace TL.Core
             {
                 actionFinished = aiBrain.finishedExecutingBestAction;
             }
-
-
-            // V opens this logic gate
-            if (actionFinished)
+            
+            if (actionFinished)  
             {
                 Debug.Log($"{name}: Action {currentAction.Name} completed");
-
-                // Reset states and go back to decide :p
+                
+                // Reset states
                 isExecutingAction = false;
                 currentAction = null;
                 if (agent != null) agent.isStopped = false;
-                currentState = State.decide;
+                
+                // Choose next state based on action type
+                if (useEmotional)
+                {
+                    Debug.Log($"{name}: Emotional action finished - going to IDLE");
+                    currentState = State.idle; // Go to idle after emotional action
+                }
+                else
+                {
+                    Debug.Log($"{name}: Utility action finished - going to DECIDE");
+                    currentState = State.decide; // Go directly to decide for utility actions
+                }
+            }
+        }
+
+        private void HandleIdleState()
+        {
+            Debug.Log($"{name}: In IDLE state - emotional action complete");
+    
+            // Check if there's a NEW T press while in idle
+            if (ShouldUseEmotionalActions())
+            {
+                Debug.Log($"{name}: New T press detected while in IDLE - responding immediately");
+                currentState = State.decide; // Respond to new T press
+            }
+            else
+            {
+                Debug.Log($"{name}: No new T press - returning to utility AI");
+                currentState = State.decide; // Return to utility AI
             }
         }
         
-
-    // --------- ACTIVE STATE ---------
-    // manages active state for special behaviors like player interaction before returning to normal AI decision making 
-    // aka, the controller should always be prioritizing player interaction 
-        private void HandleActiveState()
-        {
-            // Active state for player interaction
-            // Return to decide when interaction is complete
-            if (!isExecutingAction)
-            {
-                currentState = State.decide;
-            }
-        }
-
-
-        // Determines if emotional actions should be used.
-        // Why are we returning that boolean or statement? 
+        /// <summary>
+        /// Determines if emotional actions should be used.
+        /// ONLY use emotional actions immediately after T press, then return to utility AI.
+        /// </summary>
+        /*
+        T Press → TriggerEmotionalInteraction() → State.decide (emotional=true)
+            ->
+        EmotionBrain picks action → State.execute → Emotional action executes
+            ->
+        Action completes → State.idle → HandleIdleState() checks for new T press
+            ->
+        If new T press: Another emotional action
+        If no T press: Return to utility AI
+         */
         private bool ShouldUseEmotionalActions()
         {
-            // Use emotional actions if:
-            // 1. Player is nearby
-            // 2. NPC is in an emotional state
-            // 3. Specific triggers are met
-
-            if (IsPlayerNearby() && emotionalState != null)
+            // Check if we've had a recent T press
+            float timeSinceLastTrigger = Time.time - lastEmotionalTrigger;
+            
+            // Don't use emotional actions if:
+            // 1. No recent T press (older than timeout)
+            // 2. Already responded to current T press
+            if (timeSinceLastTrigger > emotionalTimeout || hasRespondedToCurrentTrigger)
             {
-                // Example: Use emotional actions if pleasure or arousal is high/low
-                float pleasure = emotionalState.Pleasure;
-                float arousal = emotionalState.Arousal;
-
-                // Use emotional actions if values are extreme (very high or very low)
-                return (pleasure > 0.8f || pleasure < 0.2f || arousal > 0.8f || arousal < 0.2f);
+                return false; // Return to utility AI
             }
 
-            return false;
+            
+            
+            // Only use emotional actions if:
+            // 1. Recent T press (within timeout)
+            // 2. Haven't responded yet
+            // 3. Player is nearby
+            return IsPlayerNearby();
         }
 
         public void TriggerEmotionalInteraction()
@@ -366,52 +393,30 @@ namespace TL.Core
             if (emotionBrain != null && emotionModel != null)
             {
                 Debug.Log($"{name}: Player triggered emotional interaction");
-
-                // NOTE: interface for player actions => response to NPC, need to wait for player input on UI
-                // going to use PlayerCommand.cs as inpsiration for parsing, intepreting player input.
-                // player will be given a menu / book of actions to choose from.
-
+                
+                // Update timestamps and flags
+                lastEmotionalTrigger = Time.time;
+                hasRespondedToCurrentTrigger = false; // Reset for new T press
                 
                 // Apply a player action to update the emotional model
                 PlayerAction[] demoActions = { 
                     PlayerAction.Flirt, 
                     PlayerAction.ComplimentLooks, 
-                    PlayerAction.Hug,
+                    PlayerAction.Hug, 
                     PlayerAction.TeasePlayful
                 };
-                // this is instantly but the player input should be listened on. 
-
-                PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)]; // player input
-                emotionModel.ApplyPlayerAction(selectedAction, 1.0f); // apply at full intensity for demo
-                                                                      // this is where the emotional model updates PAD and emotion  
+                
+                PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)];
+                emotionModel.ApplyPlayerAction(selectedAction, 1.0f);
                 
                 Debug.Log($"{name}: Applied player action: {selectedAction}");
                 Debug.Log($"{name}: New PAD: P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");
                 Debug.Log($"{name}: Emotion: {emotionModel.lastEmotion}");
-
-                // Game State updated before entering active state, which is just a holding pattern until interaction is done
-                // This is where we could add special interaction animations or behaviors
-                // For now, just transition to active state
-                // do we even need a active state? maybe just execute the emotional action right away?
-
-                // NOTE: no action should be executed / decided until the interaction is complete.
-                // emotional actions have the highest priority, almost like a interrupt system. 
                 
-                currentState = State.active;
-                isExecutingAction = true;
+                // Go to decide state - let FSM handle the response properly
+                currentState = State.decide;
                 
-                // Force emotional brain to decide and execute
-                emotionBrain.DecideBestEmotionalAction();
-                if (emotionBrain.bestAction != null)
-                {
-                    Debug.Log($"{name}: Emotional response: {emotionBrain.bestAction.Name}");
-                    emotionBrain.ExecuteBest();
-                }
-                else
-                {
-                    Debug.Log($"{name}: No emotional action available");
-                    isExecutingAction = false;
-                }
+                // REMOVED: Manual execution - let the state machine handle it
             }
         }
 
@@ -591,11 +596,16 @@ namespace TL.Core
             {
                 emotionalAction.Execute(npc.emotionModel, npc.anim);
                 
+                // Mark that we've responded to current T press
+                npc.hasRespondedToCurrentTrigger = true;
+                
                 // Signal completion to EmotionBrain
                 if (npc.emotionBrain != null)
                 {
                     npc.emotionBrain.finishedExecutingBestAction = true;
                 }
+                
+                Debug.Log($"{npc.name}: Emotional action complete - marked as responded");
             }
         }
     }
