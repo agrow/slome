@@ -3,6 +3,7 @@ using TL.EmotionalAI;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using Unity.VisualScripting;
 
 namespace TL.Core
 {
@@ -13,10 +14,13 @@ namespace TL.Core
     public class NPCController : MonoBehaviour
     {
         // Action States for AIBrain 
-        [Header("Action States")]
+        [HideInInspector]
         public bool isFlirting = false;
-        public bool isSocializing = false; 
+        [HideInInspector]   
+        public bool isSocializing = false;
+        [HideInInspector]
         public bool isWorking = false;
+        [HideInInspector]
         public bool isExecutingAction = false;
 
         [Header("AI Components")]
@@ -45,6 +49,7 @@ namespace TL.Core
         private Vector2 lastMove;
 
 
+
     //purpose stmt: initialize NPC components,setup, enter decision making state machine
         void Start()
         {
@@ -58,6 +63,8 @@ namespace TL.Core
             
             // Validate critical components
             ValidateComponents();
+
+            
             
             currentState = State.decide;
             
@@ -128,16 +135,15 @@ namespace TL.Core
             if (agent == null)
                 Debug.LogError($"{name}: NavMeshAgent component missing!");
         }
+        
+
 
         void Update()
         {
+
             FSMTick();
             
-            // Handle player interaction input (for emotional AI)
-            if (Input.GetKeyDown(KeyCode.T) && IsPlayerNearby())
-            {
-                TriggerEmotionalInteraction();
-            }
+            
         }
 
         void LateUpdate()
@@ -347,7 +353,7 @@ namespace TL.Core
             return false;
         }
 
-        private void TriggerEmotionalInteraction()
+        public void TriggerEmotionalInteraction()
         {
             if (emotionBrain != null && emotionModel != null)
             {
@@ -386,7 +392,7 @@ namespace TL.Core
             }
         }
 
-        private bool IsPlayerNearby()
+        public bool IsPlayerNearby()
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player == null) return false;
