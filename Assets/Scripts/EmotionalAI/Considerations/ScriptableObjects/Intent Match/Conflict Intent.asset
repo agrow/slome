@@ -9,38 +9,34 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 208b92a9b3bfc452393c358768e40db9, type: 3}
-  m_Name: Act_Soothe
+  m_Script: {fileID: 11500000, guid: eb2ea37186bd14cbf937e6e7c63a6dff, type: 3}
+  m_Name: Conflict Intent
   m_EditorClassIdentifier: 
-  Name: Soothe
-  considerations:
-  - {fileID: 11400000, guid: cc330c0f3ddea4f6eafcb4e3ba6629ac, type: 2}
-  - {fileID: 11400000, guid: 69e704d70682342b0a6803f8007bb67f, type: 2}
-  - {fileID: 11400000, guid: 6f96496fba9894b0caea7e5000ab4e81, type: 2}
-  utilityCurve:
+  Name: Conflict
+  responseCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 1
-      tangentMode: 0
+      value: 0.20056152
+      inSlope: 0.7994385
+      outSlope: 0.7994385
+      tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1
-      outSlope: 0
-      tangentMode: 0
+      inSlope: 0.7994385
+      outSlope: 0.7994385
+      tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  weight: 1
-  animationTrigger: 
-  cooldown: 2
+  desired: 7
+  onMatch: 1
+  onMismatch: 0.2

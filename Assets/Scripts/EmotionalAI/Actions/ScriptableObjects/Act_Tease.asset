@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 208b92a9b3bfc452393c358768e40db9, type: 3}
-  m_Name: Act_Soothe
+  m_Script: {fileID: 11500000, guid: 22518ceb900674794a7a7b9a37ed9982, type: 3}
+  m_Name: Act_Tease
   m_EditorClassIdentifier: 
-  Name: Soothe
+  Name: Tease
   considerations:
-  - {fileID: 11400000, guid: cc330c0f3ddea4f6eafcb4e3ba6629ac, type: 2}
+  - {fileID: 11400000, guid: 4968c2b59348546a28127ecff935db9c, type: 2}
   - {fileID: 11400000, guid: 69e704d70682342b0a6803f8007bb67f, type: 2}
-  - {fileID: 11400000, guid: 6f96496fba9894b0caea7e5000ab4e81, type: 2}
+  - {fileID: 11400000, guid: 44c6be373023840c18041db397317c40, type: 2}
   utilityCurve:
     serializedVersion: 2
     m_Curve:
@@ -43,4 +43,4 @@ MonoBehaviour:
     m_RotationOrder: 4
   weight: 1
   animationTrigger: 
-  cooldown: 2
+  cooldown: 0
