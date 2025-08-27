@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8701dd7b43c6e45f2976d6f466956fd4, type: 3}
-  m_Name: Act_Set Boundary
+  m_Script: {fileID: 11500000, guid: 1faa07e48fa6848d6b9aa1b88c0e48c8, type: 3}
+  m_Name: Act_Escalate_Flirt
   m_EditorClassIdentifier: 
-  Name: Set Boundary
+  Name: Escalate Flirt
   considerations:
-  - {fileID: 11400000, guid: cc330c0f3ddea4f6eafcb4e3ba6629ac, type: 2}
+  - {fileID: 11400000, guid: 4968c2b59348546a28127ecff935db9c, type: 2}
   - {fileID: 11400000, guid: 69e704d70682342b0a6803f8007bb67f, type: 2}
-  - {fileID: 11400000, guid: e1a615a571f81495fa930d2ca90ba877, type: 2}
+  - {fileID: 11400000, guid: c57e5d0d6999f4d7d8ba29b27a50bda4, type: 2}
   utilityCurve:
     serializedVersion: 2
     m_Curve:
@@ -61,4 +61,4 @@ MonoBehaviour:
     m_RotationOrder: 4
   weight: 1
   animationTrigger: 
-  cooldown: 2
+  cooldown: 0
