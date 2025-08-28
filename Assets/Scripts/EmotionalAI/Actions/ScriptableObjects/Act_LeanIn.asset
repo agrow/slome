@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Act_LeanIn
   m_EditorClassIdentifier: 
   Name: Lean In Action
-  considerations: []
+  considerations:
+  - {fileID: 11400000, guid: 4968c2b59348546a28127ecff935db9c, type: 2}
+  - {fileID: 11400000, guid: 09ab1424efd0c4728ade25563cc4dfe1, type: 2}
+  - {fileID: 11400000, guid: df576cd21447c44c5b8c5f6280d80c0d, type: 2}
   utilityCurve:
     serializedVersion: 2
     m_Curve:

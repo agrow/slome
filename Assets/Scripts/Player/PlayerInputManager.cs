@@ -4,8 +4,8 @@ using TL.Core;
 
 public class PlayerInputManager : MonoBehaviour
 {
-    private InputAction interactAction;
-
+    private InputAction interactAction;   
+    
     void Start()
     {
         // Setup Input Action for T key
