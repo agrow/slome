@@ -302,7 +302,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &7271340
 CapsuleCollider:
@@ -398,6 +398,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c3524d53ffb546a199992b5093d9390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  personalityType: {fileID: 0}
+  relationshipProfile: {fileID: 0}
   pad:
     P: 0.5
     A: 0.5
@@ -406,9 +408,9 @@ MonoBehaviour:
     I: 0.4
     Pa: 0.4
     C: 0.4
-  lastIntent: 0
   lastDeltaApplied: {x: 0, y: 0, z: 0}
   lastEmotion: 0
+  lastIntent: 0
 --- !u!114 &19830700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -428,6 +430,17 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 73e1c28b9e1c84620aad0219c72d1662, type: 2}
   - {fileID: 11400000, guid: 8a9ce8a5840554ae78a778678b0dd265, type: 2}
   - {fileID: 11400000, guid: d3d40f01f8b254c61af6aa8334cb5d6b, type: 2}
+  - {fileID: 11400000, guid: cf495030fe733401a91c5264725594a4, type: 2}
+  - {fileID: 11400000, guid: c881199c0986b4497ba7aa481a8d5f96, type: 2}
+  - {fileID: 11400000, guid: 7c781623d083f40cca350005703e2498, type: 2}
+  - {fileID: 11400000, guid: f79b9871e12e8492ea80239f328cd1ae, type: 2}
+  - {fileID: 11400000, guid: a1f6814cc47754ff7a037b949aa7aba7, type: 2}
+  - {fileID: 11400000, guid: eb9fe41924d0644168cbc5ba90629613, type: 2}
+  - {fileID: 11400000, guid: aa16a32358c144157a6ccb9d7c1926ec, type: 2}
+  - {fileID: 11400000, guid: 020d68e6537d447ed9613550c92709c8, type: 2}
+  - {fileID: 11400000, guid: 2c6bc7a4c39764c6aace80bcd0bf9e6f, type: 2}
+  - {fileID: 11400000, guid: 04b09f110b7124b0baa473b9353b768a, type: 2}
+  - {fileID: 11400000, guid: 684d6b9c29f1e42989441180cb5b56c9, type: 2}
 --- !u!195 &19830701
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -623,6 +636,7 @@ MonoBehaviour:
   speed: 3
   interactionRange: 5
   emotionalTimeout: 2
+  lastEmotionalTrigger: -999
   hasRespondedToCurrentTrigger: 0
 --- !u!114 &19830712
 MonoBehaviour:

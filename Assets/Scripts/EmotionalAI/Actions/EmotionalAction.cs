@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections.Generic;
+using TL.Personality;
 
 namespace TL.EmotionalAI
 {
@@ -18,6 +20,25 @@ namespace TL.EmotionalAI
         public string animationTrigger;
         public float cooldown = 0f;
         float cooldownUntil;
+
+        [Header("Personality Bias (optional)")]
+        [Tooltip("Pick a preset to auto-fill pos/neg axis multipliers if list is empty.")]
+        public BiasPreset BiasPreset = BiasPreset.None;
+
+        [Tooltip("If empty at runtime, we auto-fill from BiasPreset; otherwise we use your custom entries.")]
+        public List<PersonalityBiasEntry> PersonalityBiases = new();
+
+
+        /// <summary>
+        /// Call this once before scoring to ensure PersonalityBiases is initialized.
+        /// </summary>
+        public void EnsurePersonalityBiasesInitialized()
+        {
+            if ((PersonalityBiases == null || PersonalityBiases.Count == 0) && BiasPreset != BiasPreset.None)
+            {
+                PersonalityBiases = PersonalityBiasPresets.Get(BiasPreset);
+            }
+        }
 
         public virtual void Awake(){ score = 0f; }
 

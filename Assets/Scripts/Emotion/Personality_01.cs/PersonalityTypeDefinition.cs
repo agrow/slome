@@ -22,16 +22,6 @@ public class PersonalityTypeDefinition : ScriptableObject
     [Range(0, 1)] public float sensitivity; 
 
 
-
-
-
-
-
-
-
-
-
-
     public string primaryLoveLanguage; // only focusing on this for now 
 
     //Love Language: Words of Affirmation, Acts of Service, Receiving Gifts, Quality Time, Physical Touch
