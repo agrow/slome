@@ -62,7 +62,7 @@ namespace TL.EmotionalAI
 
         // prps stmt: apply player actions with personality and relationship integration!  this is called from npc controller
         /// Map Player Action By Intent → Get Intensity Modifier  → Calculate Relationship Delta
-        /// → Calculate PAD Delta → Apply Relationship Amp → Apply PAD Delta -> Update Emotion from last one!
+        /// → Calculate PAD Delta -> Apply Relationship Amp → Apply PAD Delta -> Update Emotion from last one!
         public void ApplyPlayerAction(PlayerAction action, float intensity = 1.0f) // this intent pretty useless rn 
         {
             // 1. Map action to intent
@@ -74,7 +74,7 @@ namespace TL.EmotionalAI
             // 3. Use intent to get relationship triangle delta
             Vector3 relationshipDelta = BaseRelationshipDeltaByIntent.Get(lastIntent) * actionIntensity;
             UpdateRelationship(relationshipDelta.x, relationshipDelta.y, relationshipDelta.z);
-                                
+
             // 4. Calculate PAD delta using intent and action intensity
             Vector3 baseDelta = GetEmotionalDelta(action, actionIntensity);
         

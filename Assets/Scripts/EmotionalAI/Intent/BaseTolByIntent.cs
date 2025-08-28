@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace TL.EmotionalAI
 {
-    // Purpose: baseline triangle delta (ΔIntimacy, ΔPassion, ΔCommitment) for each Intent.
+    // Purpose: baseline triangle delta (ΔIntimacy, ΔPassion, ΔCommitment) for each Intent
     public static class BaseRelationshipDeltaByIntent
     {
         public static Vector3 Get(Intent i) => i switch
