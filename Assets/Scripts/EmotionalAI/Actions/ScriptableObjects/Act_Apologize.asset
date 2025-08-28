@@ -9,14 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 208b92a9b3bfc452393c358768e40db9, type: 3}
-  m_Name: Act_Soothe
+  m_Script: {fileID: 11500000, guid: 479e034fdb8334d50832c9ca5702adf7, type: 3}
+  m_Name: Act_Apologize
   m_EditorClassIdentifier: 
-  Name: Soothe
-  considerations:
-  - {fileID: 11400000, guid: cc330c0f3ddea4f6eafcb4e3ba6629ac, type: 2}
-  - {fileID: 11400000, guid: 69e704d70682342b0a6803f8007bb67f, type: 2}
-  - {fileID: 11400000, guid: 6f96496fba9894b0caea7e5000ab4e81, type: 2}
+  Name: 
+  considerations: []
   utilityCurve:
     serializedVersion: 2
     m_Curve:
@@ -43,4 +40,4 @@ MonoBehaviour:
     m_RotationOrder: 4
   weight: 1
   animationTrigger: 
-  cooldown: 2
+  cooldown: 0
