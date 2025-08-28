@@ -7,43 +7,42 @@ public class PersonalityTypeDefinition : ScriptableObject
     public string typeName;  
     [TextArea] public string description;
 
-    [Range(0, 1)] public float sensitivity;
-    [Range(0, 1)] public float expressiveness;
-    [Range(0, 1)] public float emotionalResilience;
+    [Range(0, 1)] public float energy;
 
-    public bool prefersDeepConversations;
-    [Range(0, 1)] public float groupEnergy;
+    [Range(0, 1)] public float mind;
 
-    [Range(0, 1)] public float emotionalDepth;
-    [Range(0, 1)] public float autonomy;
-    [Range(0, 1)] public float structure;
+    [Range(0, 1)] public float nature;
 
-    public string stressResponse;
+    [Range(0, 1)] public float tactics;
 
+    [Range(0, 1)] public float identity;
 
+    // we should prob add more dimensions to the personality model
 
-    /*
+    [Range(0, 1)] public float sensitivity; 
 
 
-    */ 
 
-    // Brainstorm how to use these for considerations? 
-    public string primaryLoveLanguage; // e.g., Words of Affirmation, Acts of Service, Receiving Gifts, Quality Time, Physical Touch, a consideration 
-    /* Example distributions of considerations: for Love Language 
-        Physical Touch: 1.0 
-        Words of Affirmation: 8.0 
-        Quality Time: 3.0
-        Acts of Service: 6.0
-        Receiving Gifts: 2.0 
 
-        Touch: if i am feeling low pleasure, and someone touches me, i get a boost to pleasure. 
-            - Physical touch? 1.0 
-            - Intent Nudge (Hug, Hold Hands, Kiss, Cuddle): Light Nudge + 
-            - Consideration of PAD
-            - Consideration of PAD Delta
-            - Consideration of Relationship Status 
-    */ 
-    public string attachmentStyle;
+
+
+
+
+
+
+
+
+    public string primaryLoveLanguage; // only focusing on this for now 
+
+    //Love Language: Words of Affirmation, Acts of Service, Receiving Gifts, Quality Time, Physical Touch
+    // these are going to be used in the considerations ! as binary numbers that will be added to the considerations score 
+    public int WordsOfAffirmation;
+    public int ActsOfService;
+    public int ReceivingGifts;
+    public int QualityTime;
+    public int PhysicalTouch;
+
+
 
     [Range(0, 1)] public float pleasureBaseline;
     [Range(0, 1)] public float arousalBaseline;

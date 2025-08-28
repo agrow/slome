@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using TMPro;
 
@@ -50,7 +51,6 @@ public class NPC : MonoBehaviour
         // Step 3: Compose output summary
         string summary = $"{npcName} is a {definition.typeName}.\n" +
                         $"Love Language: {definition.primaryLoveLanguage}\n" +
-                        $"Attachment Style: {definition.attachmentStyle}\n" +
                         $"Emotional Baseline (PAD):\n" +
                         $"Pleasure: {definition.pleasureBaseline}, " +
                         $"Arousal: {definition.arousalBaseline}, " +

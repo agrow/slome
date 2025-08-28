@@ -7,8 +7,8 @@ using TL.EmotionalAI;
 
 public class PlayerInputManager : MonoBehaviour
 {
+    private InputAction interactAction;   
     public GameObject playerUICanvas; 
-    private InputAction interactAction;
     public TextMeshProUGUI output;
     public TMP_InputField playerInput;
     private PlayerAction parsedAction;
@@ -16,6 +16,7 @@ public class PlayerInputManager : MonoBehaviour
 
     public bool EmotionalTriggered { get; set;}
 
+    
     void Start()
     {
         EmotionalTriggered = true; // Initialize to true to allow first interaction

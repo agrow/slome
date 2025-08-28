@@ -45,8 +45,8 @@ namespace TL.Core
         private float interactionRange = 5f;
 
         [Header("Emotional AI Settings")]
-        [SerializeField] private float emotionalTimeout = 2f; // Time for one emotional response
-        private float lastEmotionalTrigger = -999f; // When T was last pressed
+        [SerializeField] public float emotionalTimeout = 2f; // Time for one emotional response
+        public float lastEmotionalTrigger = -999f; // When T was last pressed
         public bool hasRespondedToCurrentTrigger = false; // Prevent multiple responses per T press
 
         // State machine
@@ -393,17 +393,19 @@ namespace TL.Core
                 hasRespondedToCurrentTrigger = false; // Reset for new T press
 
                 // Apply a player action to update the emotional model
-                PlayerAction[] demoActions = {
-                    PlayerAction.Flirt,
-                    PlayerAction.ComplimentLooks,
-                    PlayerAction.Hug,
+                PlayerAction[] demoActions = { 
+                    PlayerAction.Flirt, 
+                    PlayerAction.ComplimentLooks,     
+                    PlayerAction.Hug, 
                     PlayerAction.TeasePlayful
                 };
+                
+                PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)];
+                // now both perosnality and action affect PAD!
+                emotionModel.ApplyPlayerAction(selectedAction, 1.0f);
+                
+                Debug.Log($"{name}: Applied player action: {selectedAction}");
 
-                //PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)];
-                emotionModel.ApplyPlayerAction(action, 1.0f);
-
-                Debug.Log($"{name}: Applied player action: {action}");
                 Debug.Log($"{name}: New PAD: P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");
                 Debug.Log($"{name}: Emotion: {emotionModel.lastEmotion}");
 
