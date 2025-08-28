@@ -21,6 +21,9 @@ public class PlayerInputManager : MonoBehaviour
     {
         EmotionalTriggered = true; // Initialize to true to allow first interaction
         // Initialize command map for text commands
+        // need to add new commands here as they are added to PlayerAction for versatility
+        // add intensity levels to player actions, so that every intent has a base pad, multiplied by the degree at which 
+        // the action is considered
         commandMap = new Dictionary<string, PlayerAction>()
         {
             { "compliment_looks", PlayerAction.ComplimentLooks },
