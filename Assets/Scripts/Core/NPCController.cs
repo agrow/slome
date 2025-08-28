@@ -385,6 +385,7 @@ namespace TL.Core
         {
             if (emotionBrain != null && emotionModel != null)
             {
+                Debug.Log($"\n=== Player Choose: {action} ===");
                 Debug.Log($"{name}: Player triggered emotional interaction");
 
                 // Update timestamps and flags
