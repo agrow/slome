@@ -155,24 +155,76 @@ namespace TL.EmotionalAI
             lastEmotion = EmotionClassifier.From(pad);
         }
 
+        //purpose stmt: gets the action intensity modifier for fine-tuning within intents
         private float GetActionIntensityModifier(PlayerAction action)
         {
             return action switch
             {
-                PlayerAction.Flirt => 0.8f,
-                PlayerAction.HoldHands => 1.0f,
-                PlayerAction.Hug => 1.1f,
-                PlayerAction.KissQuick => 1.5f,
-                PlayerAction.KissDeep => 1.8f,
-                PlayerAction.ComplimentLooks => 0.9f,
-                PlayerAction.GiftSmall => 1.0f,
-                PlayerAction.GiftLarge => 1.4f,
-                PlayerAction.TeasePlayful => 1.0f,
-                PlayerAction.InviteActivity => 1.1f,
-                PlayerAction.Apology => 0.8f,
-                PlayerAction.KeepPromise => 1.3f,
-                PlayerAction.TeaseHarsh => 1.2f,
-                _ => 1.0f
+                // Affection
+                PlayerAction.ComplimentLooks => 0.3f,
+                PlayerAction.Hug => 0.4f,
+                PlayerAction.HoldHands => 0.3f,
+                PlayerAction.Comfort => 0.3f,
+                PlayerAction.Encourage => 0.3f,
+                PlayerAction.GiftSmall => 0.3f,
+
+                // Desire
+                PlayerAction.KissQuick => 0.5f,
+                PlayerAction.KissDeep => 0.6f,
+                PlayerAction.Flirt => 0.3f,
+                PlayerAction.Seduce => 0.4f,
+                PlayerAction.LongFor => 0.3f,
+
+                // Bonding
+                PlayerAction.InviteActivity => 0.4f,
+                PlayerAction.ShareStory => 0.3f,
+                PlayerAction.Reminisce => 0.3f,
+                PlayerAction.Celebrate => 0.4f,
+                PlayerAction.Support => 0.3f,
+
+                // Trust
+                PlayerAction.Apology => 0.3f,
+                PlayerAction.Confide => 0.3f,
+                PlayerAction.Forgive => 0.3f,
+                PlayerAction.AskHelp => 0.3f,
+                PlayerAction.Promise => 0.3f,
+
+                // Respect
+                PlayerAction.ComplimentSkill => 0.3f,
+                PlayerAction.Acknowledge => 0.3f,
+                PlayerAction.Admire => 0.3f,
+                PlayerAction.Defend => 0.4f,
+                PlayerAction.Praise => 0.3f,
+
+                // Playfulness
+                PlayerAction.TeasePlayful => 0.3f,
+                PlayerAction.Joke => 0.3f,
+                PlayerAction.Challenge => 0.4f,
+                PlayerAction.Surprise => 0.4f,
+                PlayerAction.Trick => 0.3f,
+
+                // Security
+                PlayerAction.KeepPromise => 0.4f,
+                PlayerAction.Reassure => 0.3f,
+                PlayerAction.Protect => 0.4f,
+                PlayerAction.Shelter => 0.3f,
+                PlayerAction.Steady => 0.3f,
+
+                // Conflict
+                PlayerAction.TeaseHarsh => 0.4f,
+                PlayerAction.Confront => 0.4f,
+                PlayerAction.Criticize => 0.3f,
+                PlayerAction.Withdraw => 0.2f,
+                PlayerAction.Demand => 0.4f,
+
+                // Manipulation
+                PlayerAction.GiftLarge => 0.4f,
+                PlayerAction.GuiltTrip => 0.3f,
+                PlayerAction.Flatter => 0.3f,
+                PlayerAction.Pressure => 0.4f,
+                PlayerAction.Withhold => 0.3f,
+
+                _ => 0.3f
             };
         }
 
