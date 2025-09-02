@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 540fd28bee1824422bbfd02ffcb8113a, type: 3}
+  m_Name: Tease Playfully
+  m_EditorClassIdentifier: 
+  Name: Tease Playfully
+  considerations:
+  - {fileID: 11400000, guid: 4968c2b59348546a28127ecff935db9c, type: 2}
+  - {fileID: 11400000, guid: 09ab1424efd0c4728ade25563cc4dfe1, type: 2}
+  - {fileID: 11400000, guid: c57e5d0d6999f4d7d8ba29b27a50bda4, type: 2}
+  - {fileID: 11400000, guid: 783875496204744baa3a6cfcd1ae2a77, type: 2}
+  utilityCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  weight: 1
+  animationTrigger: 
+  cooldown: 0
+  BiasPreset: 26
+  PersonalityBiases: []
