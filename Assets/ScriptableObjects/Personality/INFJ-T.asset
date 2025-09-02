@@ -14,17 +14,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   typeName: ENTJ-A
   description: Bold, assertive, and strategic. Values leadership and loyalty.
-  sensitivity: 0.4
-  expressiveness: 0.5
-  emotionalResilience: 0.8
-  prefersDeepConversations: 0
-  groupEnergy: 0.8
-  emotionalDepth: 0.5
-  autonomy: 0.7
-  structure: 1
-  stressResponse: dominate
+  energy: 0.2
+  mind: 0.9
+  nature: 0.75
+  tactics: 0.85
+  identity: 0.3
+  sensitivity: 0
   primaryLoveLanguage: acts_of_service
-  attachmentStyle: secure
+  WordsOfAffirmation: 0
+  ActsOfService: 0
+  ReceivingGifts: 0
+  QualityTime: 0
+  PhysicalTouch: 0
   pleasureBaseline: 0.7
   arousalBaseline: 0.7
   dominanceBaseline: 0.7

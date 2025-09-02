@@ -20,30 +20,82 @@ public class PlayerInputManager : MonoBehaviour
     void Start()
     {
         EmotionalTriggered = true; // Initialize to true to allow first interaction
-        // Initialize command map for text commands
-        // need to add new commands here as they are added to PlayerAction for versatility
-        // add intensity levels to player actions, so that every intent has a base pad, multiplied by the degree at which 
-        // the action is considered
+                                   // Initialize command map for text commands
+                                   // need to add new commands here as they are added to PlayerAction for versatility
+                                   // add intensity levels to player actions, so that every intent has a base pad, multiplied by the degree at which 
+                                   // the action is considered
+                                   // ...existing code...
         commandMap = new Dictionary<string, PlayerAction>()
         {
+            // Affection
             { "compliment_looks", PlayerAction.ComplimentLooks },
+            { "hug",              PlayerAction.Hug },
+            { "hold_hands",       PlayerAction.HoldHands },
+            { "comfort",          PlayerAction.Comfort },
+            { "encourage",        PlayerAction.Encourage },
+            { "gift_small",       PlayerAction.GiftSmall },
+        
+            // Desire
+            { "kiss_quick",       PlayerAction.KissQuick },
+            { "kiss_deep",        PlayerAction.KissDeep },
+            { "flirt",            PlayerAction.Flirt },
+            { "seduce",           PlayerAction.Seduce },
+            { "long_for",         PlayerAction.LongFor },
+        
+            // Bonding
+            { "invite_activity",  PlayerAction.InviteActivity },
+            { "share_story",      PlayerAction.ShareStory },
+            { "reminisce",        PlayerAction.Reminisce },
+            { "celebrate",        PlayerAction.Celebrate },
+            { "support",          PlayerAction.Support },
+        
+            // Trust
+            { "apology",          PlayerAction.Apology },
+            { "confide",          PlayerAction.Confide },
+            { "forgive",          PlayerAction.Forgive },
+            { "ask_help",         PlayerAction.AskHelp },
+            { "promise",          PlayerAction.Promise },
+        
+            // Respect
             { "compliment_skill", PlayerAction.ComplimentSkill },
-            { "flirt", PlayerAction.Flirt },
-            { "hold_hands", PlayerAction.HoldHands },
-            { "hug", PlayerAction.Hug },
-            { "kiss_quick", PlayerAction.KissQuick },
-            { "kiss_deep", PlayerAction.KissDeep },
-            { "gift_small", PlayerAction.GiftSmall },
-            { "gift_large", PlayerAction.GiftLarge },
-            { "apology", PlayerAction.Apology },
-            { "tease_playful", PlayerAction.TeasePlayful },
-            { "tease_harsh", PlayerAction.TeaseHarsh },
-            { "keep_promise", PlayerAction.KeepPromise },
-            { "invite_activity", PlayerAction.InviteActivity }
+            { "acknowledge",      PlayerAction.Acknowledge },
+            { "admire",           PlayerAction.Admire },
+            { "defend",           PlayerAction.Defend },
+            { "praise",           PlayerAction.Praise },
+        
+            // Playfulness
+            { "tease_playful",    PlayerAction.TeasePlayful },
+            { "joke",             PlayerAction.Joke },
+            { "challenge",        PlayerAction.Challenge },
+            { "surprise",         PlayerAction.Surprise },
+            { "trick",            PlayerAction.Trick },
+        
+            // Security
+            { "keep_promise",     PlayerAction.KeepPromise },
+            { "reassure",         PlayerAction.Reassure },
+            { "protect",          PlayerAction.Protect },
+            { "shelter",          PlayerAction.Shelter },
+            { "steady",           PlayerAction.Steady },
+        
+            // Conflict
+            { "tease_harsh",      PlayerAction.TeaseHarsh },
+            { "confront",         PlayerAction.Confront },
+            { "criticize",       PlayerAction.Criticize },
+            { "withdraw",        PlayerAction.Withdraw },
+            { "demand",          PlayerAction.Demand },
+
+            //Manipulation
+            { "guilt_trip",      PlayerAction.GiftLarge },
+            { "bribe",           PlayerAction.GuiltTrip },
+            { "threaten",        PlayerAction.Flatter },
+            { "lie",             PlayerAction.Pressure },
+            { "blackmail",       PlayerAction.Withhold }
         };
+
+
         
         // Setup Input Action for T key
-        interactAction = new InputAction("interact", InputActionType.Button);
+            interactAction = new InputAction("interact", InputActionType.Button);
         interactAction.AddBinding("<Keyboard>/t");
 
         // Subscribe to the performed event

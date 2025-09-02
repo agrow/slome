@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 
-
 /*  Purpose Statement:
     EmotionalCore.cs — Defines PAD, Triangle (relationship), 
     PlayerAction, Intent, EmotionOctant
@@ -13,9 +12,32 @@ namespace TL.EmotionalAI
 
     public enum PlayerAction
     {
-        ComplimentLooks, ComplimentSkill, Flirt, HoldHands, Hug,
-        KissQuick, KissDeep, GiftSmall, GiftLarge, Apology,
-        TeasePlayful, TeaseHarsh, KeepPromise, InviteActivity
+        // Affection
+        ComplimentLooks, Hug, HoldHands, Comfort, Encourage, GiftSmall,
+
+        // Desire
+        KissQuick, KissDeep, Flirt, Seduce, LongFor,
+
+        // Bonding
+        InviteActivity, ShareStory, Reminisce, Celebrate, Support,
+
+        // Trust
+        Apology, Confide, Forgive, AskHelp, Promise,
+
+        // Respect
+        ComplimentSkill, Acknowledge, Admire, Defend, Praise,
+
+        // Playfulness
+        TeasePlayful, Joke, Challenge, Surprise, Trick,
+
+        // Security
+        KeepPromise, Reassure, Protect, Shelter, Steady,
+
+        // Conflict
+        TeaseHarsh, Confront, Criticize, Withdraw, Demand,
+
+        // Manipulation
+        GiftLarge, GuiltTrip, Flatter, Pressure, Withhold
     }
 
     public enum Intent { Affection, Desire, Bonding, Trust, Respect, Playfulness, Security, Conflict, Manipulation }
