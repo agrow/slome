@@ -296,17 +296,6 @@ namespace TL.EmotionalAI
         }
         //private helper methods 
 
-    
-
-
-
-
-
-
-
-
-
-
         //debug methods 
 
         [ContextMenu("Reset to Baseline")]
