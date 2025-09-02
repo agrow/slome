@@ -9,11 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4917de172ced345eab8bd003ee84aea0, type: 3}
-  m_Name: Tease Harsh
+  m_Script: {fileID: 11500000, guid: 2d0cbdec41f0d42579ca374917dea769, type: 3}
+  m_Name: Guilt Trip
   m_EditorClassIdentifier: 
-  Name: Tease Harsh
-  considerations: []
+  Name: Guilt Trip
+  considerations:
+  - {fileID: 11400000, guid: cc330c0f3ddea4f6eafcb4e3ba6629ac, type: 2}
+  - {fileID: 11400000, guid: 09ab1424efd0c4728ade25563cc4dfe1, type: 2}
+  - {fileID: 11400000, guid: df576cd21447c44c5b8c5f6280d80c0d, type: 2}
   utilityCurve:
     serializedVersion: 2
     m_Curve:
@@ -21,7 +24,7 @@ MonoBehaviour:
       time: 0
       value: 0
       inSlope: 0
-      outSlope: 1
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -29,7 +32,7 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 1
+      inSlope: 0
       outSlope: 0
       tangentMode: 0
       weightedMode: 0
@@ -41,5 +44,5 @@ MonoBehaviour:
   weight: 1
   animationTrigger: 
   cooldown: 0
-  BiasPreset: 0
+  BiasPreset: 43
   PersonalityBiases: []

@@ -1,34 +1,43 @@
 // Purpose: Dropdown presets per action "archetype" so you don't hand-enter numbers.
 // Pick a BiasPreset on an action; if its PersonalityBiases list is empty at runtime,
 // we'll auto-fill with these values (pos/neg per axis). No editor tooling needed.
+//
+// posMultiplier applies to E/N/F/J/A; negMultiplier applies to I/S/T/P/Turbulent.
+// Keep values small so PAD remains the main driver.
 
 using System.Collections.Generic;
 
 namespace TL.Personality
 {
-    /// <summary>
-    /// Choose one preset per action in the Inspector.
-    /// </summary>
+    /// <summary> Choose one preset per action in the Inspector. </summary>
     public enum BiasPreset
     {
         None = 0,
 
         // Affection
-        HugWarm, CuddleLeanIn, HoldHands, GentleTouch, WordsOfComfort,
+        ComplimentLooks, Hug, HoldHands, Comfort, Encourage,
+
         // Desire
-        FlirtPlayful, KissQuick, KissDeep, ComplimentAppearance, PlayfulTease,
+        KissQuick, KissDeep, Flirt, Seduce, LongFor,
+
         // Bonding
-        SharePersonalStory, AskAboutDayDeep, PlanFutureLight, ReminisceMemory, InsideJoke,
+        InviteActivity, ShareStory, Reminisce, Celebrate, Support,
+
         // Trust
-        KeepPromise, ConfideVulnerability, AskConsent, AdmitFault, ShieldFromOverwhelm,
+        Apology, Confide, Forgive, AskHelp, Promise,
+
         // Respect
-        RespectBoundary, GiveSpace, ApologizeDirect, InviteChoice, CreditContribution,
+        ComplimentSkill, Acknowledge, Admire, Defend, Praise,
+
         // Playfulness
-        LightJoke, MiniGame, ShareFunnyThing, MockSeriousCompliment, SpontaneousDetour,
+        TeasePlayful, Joke, Challenge, Surprise, Trick,
+
         // Security
-        ReassureCommitment, SafetyCheck, CreateCalmEnv, QuietPresence, ProtectiveGesture,
-        // Conflict Repair
-        NameTheTension, OfferRepairPlan, TimeOutMutual, ReflectBack, LightenAfterRepair
+        KeepPromise, Reassure, Protect, Deflect, Anchor,
+
+        // Conflict / Manipulative
+        TeaseHarsh, Confront, Criticize, Withdraw, Demand,
+        Manipulation, GiftLarge, GuiltTrip, Flatter, Pressure, Withhold
     }
 
     public static class PersonalityBiasPresets
@@ -38,110 +47,122 @@ namespace TL.Personality
 
         /// <summary>
         /// Returns the recommended bias list for the given preset.
-        /// If a preset doesn't need personality, return empty list.
+        /// If a preset doesn't need personality, return an empty list.
         /// </summary>
         public static List<PersonalityBiasEntry> Get(BiasPreset preset)
         {
             switch (preset)
             {
                 // ---------- AFFECTION ----------
-                case BiasPreset.HugWarm:
+                case BiasPreset.ComplimentLooks:
+                    return new() { Bias(Axis.Energy,1.08f,1.00f), Bias(Axis.Nature,1.08f,0.98f) };
+                case BiasPreset.Hug:
                     return new() { Bias(Axis.Energy,1.10f,0.95f), Bias(Axis.Nature,1.10f,0.95f) };
-                case BiasPreset.CuddleLeanIn:
-                    return new() { Bias(Axis.Energy,1.05f,1.00f), Bias(Axis.Nature,1.10f,0.95f) };
                 case BiasPreset.HoldHands:
                     return new() { Bias(Axis.Energy,1.10f,0.95f) };
-                case BiasPreset.GentleTouch:
-                    return new() { Bias(Axis.Nature,1.10f,0.95f) };
-                case BiasPreset.WordsOfComfort:
+                case BiasPreset.Comfort:
                     return new() { Bias(Axis.Nature,1.12f,0.98f) };
+                case BiasPreset.Encourage:
+                    return new() { Bias(Axis.Nature,1.08f,1.00f), Bias(Axis.Energy,1.06f,1.00f) };
 
                 // ---------- DESIRE ----------
-                case BiasPreset.FlirtPlayful:
-                    return new() { Bias(Axis.Energy,1.10f,0.95f), Bias(Axis.Identity,1.08f,0.98f) };
                 case BiasPreset.KissQuick:
                     return new() { Bias(Axis.Energy,1.10f,0.95f) };
                 case BiasPreset.KissDeep:
                     return new() { Bias(Axis.Identity,1.10f,0.95f) };
-                case BiasPreset.ComplimentAppearance:
-                    return new() { Bias(Axis.Energy,1.08f,1.00f), Bias(Axis.Nature,1.08f,0.98f) };
-                case BiasPreset.PlayfulTease:
-                    return new() { Bias(Axis.Energy,1.08f,0.98f), Bias(Axis.Tactics,0.98f,1.10f) };
+                case BiasPreset.Flirt:
+                    return new() { Bias(Axis.Energy,1.10f,0.95f), Bias(Axis.Identity,1.08f,0.98f) };
+                case BiasPreset.Seduce:
+                    return new() { Bias(Axis.Identity,1.10f,0.95f), Bias(Axis.Energy,1.06f,1.00f) };
+                case BiasPreset.LongFor:
+                    return new() { Bias(Axis.Energy,0.98f,1.06f), Bias(Axis.Nature,1.06f,1.00f) };
 
                 // ---------- BONDING ----------
-                case BiasPreset.SharePersonalStory:
-                    return new() { Bias(Axis.Mind,1.10f,1.00f), Bias(Axis.Nature,1.08f,0.98f) };
-                case BiasPreset.AskAboutDayDeep:
-                    return new() { Bias(Axis.Mind,0.98f,1.10f), Bias(Axis.Nature,1.08f,0.98f) };
-                case BiasPreset.PlanFutureLight:
-                    return new() { Bias(Axis.Mind,1.10f,0.98f), Bias(Axis.Tactics,1.10f,0.95f) };
-                case BiasPreset.ReminisceMemory:
-                    return new() { Bias(Axis.Mind,0.98f,1.10f), Bias(Axis.Nature,1.08f,0.98f) };
-                case BiasPreset.InsideJoke:
-                    return new() { Bias(Axis.Tactics,0.98f,1.10f) };
+                case BiasPreset.InviteActivity:
+                    return new() { Bias(Axis.Mind,0.98f,1.10f),  Bias(Axis.Tactics,1.04f,1.02f) };
+                case BiasPreset.ShareStory:
+                    return new() { Bias(Axis.Mind,1.10f,1.00f),  Bias(Axis.Nature,1.06f,1.00f) };
+                case BiasPreset.Reminisce:
+                    return new() { Bias(Axis.Mind,0.98f,1.10f),  Bias(Axis.Nature,1.06f,1.00f) };
+                case BiasPreset.Celebrate:
+                    return new() { Bias(Axis.Energy,1.10f,0.95f) };
+                case BiasPreset.Support:
+                    return new() { Bias(Axis.Nature,1.06f,1.00f), Bias(Axis.Tactics,1.06f,1.00f) };
 
                 // ---------- TRUST ----------
-                case BiasPreset.KeepPromise:
-                    return new() { Bias(Axis.Tactics,1.10f,0.95f) };
-                case BiasPreset.ConfideVulnerability:
-                    return new() { Bias(Axis.Nature,1.10f,0.98f), Bias(Axis.Identity,0.98f,1.10f) };
-                case BiasPreset.AskConsent:
-                    return new() { Bias(Axis.Nature,1.00f,1.10f) };
-                case BiasPreset.AdmitFault:
-                    return new() { Bias(Axis.Identity,0.98f,1.10f) };
-                case BiasPreset.ShieldFromOverwhelm:
+                case BiasPreset.Apology:
+                    return new() { Bias(Axis.Identity,0.98f,1.10f), Bias(Axis.Nature,1.06f,1.00f) };
+                case BiasPreset.Confide:
                     return new() { Bias(Axis.Nature,1.10f,0.98f) };
+                case BiasPreset.Forgive:
+                    return new() { Bias(Axis.Nature,1.08f,1.00f), Bias(Axis.Identity,1.02f,1.04f) };
+                case BiasPreset.AskHelp:
+                    return new() { Bias(Axis.Identity,0.98f,1.08f) };
+                case BiasPreset.Promise:
+                    return new() { Bias(Axis.Tactics,1.10f,0.95f) };
 
                 // ---------- RESPECT ----------
-                case BiasPreset.RespectBoundary:
-                    return new() { Bias(Axis.Nature,0.98f,1.10f), Bias(Axis.Tactics,1.08f,0.98f) };
-                case BiasPreset.GiveSpace:
-                    return new() { Bias(Axis.Nature,0.98f,1.10f), Bias(Axis.Tactics,1.08f,0.98f) };
-                case BiasPreset.ApologizeDirect:
-                    return new() { Bias(Axis.Nature,1.08f,1.00f), Bias(Axis.Identity,0.98f,1.10f) };
-                case BiasPreset.InviteChoice:
-                    return new() { Bias(Axis.Nature,0.98f,1.10f), Bias(Axis.Tactics,0.98f,1.10f) };
-                case BiasPreset.CreditContribution:
-                    return new() { Bias(Axis.Nature,1.10f,0.98f) };
+                case BiasPreset.ComplimentSkill:
+                    return new() { Bias(Axis.Nature,1.06f,1.00f) };
+                case BiasPreset.Acknowledge:
+                    return new() { Bias(Axis.Nature,1.08f,1.00f) };
+                case BiasPreset.Admire:
+                    return new() { Bias(Axis.Nature,1.06f,1.00f) };
+                case BiasPreset.Defend:
+                    return new() { Bias(Axis.Nature,1.02f,1.08f), Bias(Axis.Identity,1.06f,1.00f) };
+                case BiasPreset.Praise:
+                    return new() { Bias(Axis.Energy,1.06f,1.00f), Bias(Axis.Nature,1.06f,1.00f) };
 
                 // ---------- PLAYFULNESS ----------
-                case BiasPreset.LightJoke:
+                case BiasPreset.TeasePlayful:
+                    return new() { Bias(Axis.Energy,1.10f,0.95f), Bias(Axis.Tactics,0.98f,1.10f) };
+                case BiasPreset.Joke:
                     return new() { Bias(Axis.Energy,1.12f,0.95f) };
-                case BiasPreset.MiniGame:
+                case BiasPreset.Challenge:
                     return new() { Bias(Axis.Energy,1.10f,0.95f), Bias(Axis.Tactics,0.98f,1.10f) };
-                case BiasPreset.ShareFunnyThing:
-                    return new() { Bias(Axis.Energy,1.08f,0.98f), Bias(Axis.Mind,1.08f,1.00f) };
-                case BiasPreset.MockSeriousCompliment:
+                case BiasPreset.Surprise:
+                    return new() { Bias(Axis.Energy,1.10f,0.95f) };
+                case BiasPreset.Trick:
                     return new() { Bias(Axis.Tactics,0.98f,1.10f) };
-                case BiasPreset.SpontaneousDetour:
-                    return new() { Bias(Axis.Energy,1.10f,0.95f), Bias(Axis.Tactics,0.98f,1.10f) };
 
                 // ---------- SECURITY ----------
-                case BiasPreset.ReassureCommitment:
+                case BiasPreset.KeepPromise:
+                    return new() { Bias(Axis.Tactics,1.10f,0.95f) };
+                case BiasPreset.Reassure:
                     return new() { Bias(Axis.Identity,0.95f,1.12f), Bias(Axis.Nature,1.08f,1.00f) };
-                case BiasPreset.SafetyCheck:
-                    return new() { Bias(Axis.Identity,0.98f,1.10f) };
-                case BiasPreset.CreateCalmEnv:
-                    return new() { Bias(Axis.Nature,0.98f,1.10f) };
-                case BiasPreset.QuietPresence:
-                    return new() { Bias(Axis.Nature,1.10f,0.98f) };
-                case BiasPreset.ProtectiveGesture:
+                case BiasPreset.Protect:
                     return new() { Bias(Axis.Identity,1.10f,0.95f) };
-
-                // ---------- CONFLICT REPAIR ----------
-                case BiasPreset.NameTheTension:
+                case BiasPreset.Deflect:
                     return new() { Bias(Axis.Nature,0.98f,1.10f) };
-                case BiasPreset.OfferRepairPlan:
-                    return new() { Bias(Axis.Nature,1.00f,1.10f), Bias(Axis.Tactics,1.10f,0.95f) };
-                case BiasPreset.TimeOutMutual:
-                    return new() { Bias(Axis.Identity,1.06f,1.06f) };
-                case BiasPreset.ReflectBack:
-                    return new() { Bias(Axis.Nature,1.12f,0.98f) };
-                case BiasPreset.LightenAfterRepair:
-                    return new() { Bias(Axis.Energy,1.08f,0.98f), Bias(Axis.Tactics,0.98f,1.10f) };
+                case BiasPreset.Anchor:
+                    return new() { Bias(Axis.Mind,1.06f,1.00f),   Bias(Axis.Nature,1.06f,1.00f) };
+
+                // ---------- CONFLICT / MANIPULATIVE ----------
+                case BiasPreset.TeaseHarsh:
+                    return new() { Bias(Axis.Nature,0.98f,1.08f), Bias(Axis.Energy,0.98f,1.08f) };
+                case BiasPreset.Confront:
+                    return new() { Bias(Axis.Identity,1.10f,0.95f), Bias(Axis.Nature,0.98f,1.10f) };
+                case BiasPreset.Criticize:
+                    return new() { Bias(Axis.Nature,0.98f,1.10f) };
+                case BiasPreset.Withdraw:
+                    return new() { Bias(Axis.Energy,0.95f,1.10f) };
+                case BiasPreset.Demand:
+                    return new() { Bias(Axis.Identity,1.10f,0.95f) };
+                case BiasPreset.Manipulation:
+                    return new() { Bias(Axis.Nature,0.98f,1.10f) };
+                case BiasPreset.GiftLarge:
+                    return new() { Bias(Axis.Identity,1.06f,1.00f), Bias(Axis.Nature,0.98f,1.08f) };
+                case BiasPreset.GuiltTrip:
+                    return new() { Bias(Axis.Energy,0.98f,1.08f),   Bias(Axis.Nature,0.98f,1.08f) };
+                case BiasPreset.Flatter:
+                    return new() { Bias(Axis.Energy,1.06f,1.00f),   Bias(Axis.Identity,1.04f,1.00f) };
+                case BiasPreset.Pressure:
+                    return new() { Bias(Axis.Identity,1.10f,0.95f) };
+                case BiasPreset.Withhold:
+                    return new() { Bias(Axis.Energy,0.98f,1.08f),   Bias(Axis.Identity,1.02f,1.06f) };
             }
 
-            return new(); // None or fallback
+            return new List<PersonalityBiasEntry>(); // None or fallback
         }
     }
 }

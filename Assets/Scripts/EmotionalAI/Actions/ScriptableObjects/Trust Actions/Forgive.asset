@@ -9,34 +9,39 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb2ea37186bd14cbf937e6e7c63a6dff, type: 3}
-  m_Name: Conflict_Intent
+  m_Script: {fileID: 11500000, guid: fd6cf3d847c384e26bb48e8c5bb41e0f, type: 3}
+  m_Name: Forgive
   m_EditorClassIdentifier: 
-  Name: Conflict
-  responseCurve:
+  Name: Forgive
+  considerations:
+  - {fileID: 11400000, guid: c57e5d0d6999f4d7d8ba29b27a50bda4, type: 2}
+  - {fileID: 11400000, guid: df576cd21447c44c5b8c5f6280d80c0d, type: 2}
+  utilityCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.20056152
-      inSlope: 0.7994385
-      outSlope: 0.7994385
-      tangentMode: 34
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0.7994385
-      outSlope: 0.7994385
-      tangentMode: 34
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  desired: 7
-  onMatch: 1
-  onMismatch: 0.2
+  weight: 1
+  animationTrigger: 
+  cooldown: 0
+  BiasPreset: 18
+  PersonalityBiases: []

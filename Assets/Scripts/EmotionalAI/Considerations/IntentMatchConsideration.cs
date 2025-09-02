@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace TL.EmotionalAI
 {
-    // 
     [CreateAssetMenu(menuName="EmotionalAI/Considerations/Intent Match (Nudge)")]
     public class IntentMatchConsideration : EmotionalConsideration
     {
