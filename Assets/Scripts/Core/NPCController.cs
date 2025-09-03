@@ -184,7 +184,7 @@ namespace TL.Core
             
             // Add debug info for emotional state
             float timeSinceLastTrigger = Time.time - lastEmotionalTrigger;
-            Debug.Log($"{name}: Time since T press: {timeSinceLastTrigger:F1}s, Responded: {hasRespondedToCurrentTrigger}");
+            //Debug.Log($"{name}: Time since T press: {timeSinceLastTrigger:F1}s, Responded: {hasRespondedToCurrentTrigger}");
             
             // Reset execution flag
             isExecutingAction = false;
@@ -404,7 +404,7 @@ namespace TL.Core
                 // now both perosnality and action affect PAD!
                 emotionModel.ApplyPlayerAction(selectedAction, 1.0f);
                 
-                Debug.Log($"{name}: Applied player action: {selectedAction}");
+                Debug.Log($"{name}: Applied action: {selectedAction}");
 
                 Debug.Log($"{name}: New PAD: P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");
                 Debug.Log($"{name}: Emotion: {emotionModel.lastEmotion}");

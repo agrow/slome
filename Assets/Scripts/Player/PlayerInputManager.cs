@@ -95,8 +95,9 @@ public class PlayerInputManager : MonoBehaviour
 
         
         // Setup Input Action for T key
-            interactAction = new InputAction("interact", InputActionType.Button);
+        interactAction = new InputAction("interact", InputActionType.Button);
         interactAction.AddBinding("<Keyboard>/t");
+
 
         // Subscribe to the performed event
         interactAction.performed += OnInteractPressed;
@@ -106,11 +107,17 @@ public class PlayerInputManager : MonoBehaviour
         Debug.Log("[GLOBAL_INPUT] PlayerInputManager initialized");
     }
 
+    //called whenever t is pressed 
     private void OnInteractPressed(InputAction.CallbackContext context)
     {
-        Debug.Log("[GLOBAL_INPUT] T key pressed - showing UI");
-        playerUICanvas.SetActive(true);
-        playerInput.text = "";
+        if (!playerUICanvas.activeSelf)
+        {
+            Debug.Log("[GLOBAL_INPUT] T key pressed - showing UI");
+            playerUICanvas.SetActive(true);
+            playerInput.text = "";
+            playerInput.Select();
+            playerInput.ActivateInputField(); // Focus input for typing
+        }
     }
 
     // Called by the Done button

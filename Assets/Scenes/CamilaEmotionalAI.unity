@@ -339,9 +339,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15dea9a53a5cea443923fd5622ad5681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerUICanvas: {fileID: 0}
-  output: {fileID: 0}
-  playerInput: {fileID: 0}
+  playerUICanvas: {fileID: 1847818916}
+  output: {fileID: 385713233}
+  playerInput: {fileID: 1423955280}
 --- !u!1 &19830697
 GameObject:
   m_ObjectHideFlags: 0
