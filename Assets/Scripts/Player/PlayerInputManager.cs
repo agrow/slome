@@ -124,6 +124,7 @@ public class PlayerInputManager : MonoBehaviour
     public void ParseInput()
     {
         EmotionalTriggered = true; // Initialize to true to allow first interaction
+        playerUICanvas.SetActive(false); // Hide UI at start
         string inputText = playerInput.text.ToLower().Trim();
         // Validate and parse input
         if (!commandMap.TryGetValue(inputText, out parsedAction))
