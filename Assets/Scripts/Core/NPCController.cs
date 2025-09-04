@@ -19,7 +19,7 @@ namespace TL.Core
         public bool isFlirting = false;
         [HideInInspector]   
         public bool isSocializing = false;
-        [HideInInspector]
+        [HideInInspector]            
         public bool isWorking = false;
         [HideInInspector]
         public bool isExecutingAction = false;
@@ -393,19 +393,9 @@ namespace TL.Core
                 hasRespondedToCurrentTrigger = false; // Reset for new T press
 
                 // Apply a player action to update the emotional model
-                PlayerAction[] demoActions = { 
-                    PlayerAction.Flirt, 
-                    PlayerAction.ComplimentLooks,     
-                    PlayerAction.Hug, 
-                    PlayerAction.TeasePlayful
-                };
-                
-                PlayerAction selectedAction = demoActions[Random.Range(0, demoActions.Length)];
-                // now both perosnality and action affect PAD!
-                emotionModel.ApplyPlayerAction(selectedAction, 1.0f);
-                
-                Debug.Log($"{name}: Applied action: {selectedAction}");
+                emotionModel.ApplyPlayerAction(action, 1.0f);
 
+                Debug.Log($"{name}: Applied action: {action}");
                 Debug.Log($"{name}: New PAD: P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");
                 Debug.Log($"{name}: Emotion: {emotionModel.lastEmotion}");
 
@@ -419,14 +409,14 @@ namespace TL.Core
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player == null) return false;
-            
+
             float distance = Vector3.Distance(transform.position, player.transform.position);
-            
-            #if UNITY_EDITOR
-            Debug.DrawLine(transform.position, player.transform.position, 
+
+#if UNITY_EDITOR
+            Debug.DrawLine(transform.position, player.transform.position,
                 distance <= interactionRange ? Color.green : Color.red);
-            #endif
-            
+#endif
+
             return distance <= interactionRange;
         }
 

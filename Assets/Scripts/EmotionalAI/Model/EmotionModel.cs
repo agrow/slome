@@ -310,6 +310,7 @@ namespace TL.EmotionalAI
         {
             Debug.Log($"=== {name} State ===");
             Debug.Log($"PAD: P={pad.P:F2}, A={pad.A:F2}, D={pad.D:F2}");
+            Debug.Log($"Personality: {personalityType?.typeName ?? "None"}");
             Debug.Log($"Emotion: {lastEmotion}");
             Debug.Log($"Relationship: {GetCurrentRelationshipType()}");
             Debug.Log($"Triangle: I={tri.I:F2}, Pa={tri.Pa:F2}, C={tri.C:F2}");

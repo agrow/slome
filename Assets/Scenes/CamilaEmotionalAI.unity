@@ -398,7 +398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c3524d53ffb546a199992b5093d9390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  personalityType: {fileID: 0}
+  personalityType: {fileID: 11400000, guid: a46cd71c44262b5489468d4f3d2c9b83, type: 2}
   relationshipProfile: {fileID: 0}
   pad:
     P: 0.5
