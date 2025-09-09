@@ -787,7 +787,6 @@ GameObject:
   - component: {fileID: 747508652}
   - component: {fileID: 747508651}
   - component: {fileID: 747508659}
-  - component: {fileID: 747508658}
   - component: {fileID: 747508660}
   m_Layer: 0
   m_Name: EmotionalNPC1
@@ -875,36 +874,13 @@ Transform:
   m_GameObject: {fileID: 747508650}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.3, y: 0.258, z: -4.7}
+  m_LocalPosition: {x: 1.3, y: 0.23, z: -4.7}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1813403108}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &747508658
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 747508650}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.06254483
-  m_Height: 0.26
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &747508659
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -960,7 +936,6 @@ GameObject:
   - component: {fileID: 765919625}
   - component: {fileID: 765919624}
   - component: {fileID: 765919631}
-  - component: {fileID: 765919630}
   - component: {fileID: 765919632}
   m_Layer: 0
   m_Name: EmotionalNPC2
@@ -1048,36 +1023,13 @@ Transform:
   m_GameObject: {fileID: 765919623}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.27, y: 0.258, z: -4}
+  m_LocalPosition: {x: 1.27, y: 0.23, z: -4}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 937587460}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &765919630
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 765919623}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.06254483
-  m_Height: 0.26
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!54 &765919631
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1917,7 +1869,7 @@ Transform:
   m_GameObject: {fileID: 1813403107}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.029, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
