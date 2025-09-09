@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fcc20511ca53c47d7bdf9aa7f6f41df3, type: 3}
   m_Name: INFJ-T
   m_EditorClassIdentifier: 
-  typeName: ENTJ-A
+  typeName: INFJ-T
   description: Bold, assertive, and strategic. Values leadership and loyalty.
   energy: 0.2
   mind: 0.9
