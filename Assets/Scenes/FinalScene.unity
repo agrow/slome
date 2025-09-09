@@ -976,14 +976,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 747508650}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 30480fe1a748940199f2c7b67e528278, type: 3}
+  m_Script: {fileID: 11500000, guid: c44571c8fb1acc44a8bd14cbddddf29d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emotion: {fileID: 0}
-  animator: {fileID: 0}
-  actions:
-  - {fileID: 0}
-  npcPersonality: {fileID: 0}
+  isFlirting: 0
+  isSocializing: 0
+  isWorking: 0
+  isExecutingAction: 0
+  speed: 3
+  interactionRange: 5
+  emotionalTimeout: 2
+  lastEmotionalTrigger: -999
+  hasRespondedToCurrentTrigger: 0
 --- !u!1 &765919623
 GameObject:
   m_ObjectHideFlags: 0
