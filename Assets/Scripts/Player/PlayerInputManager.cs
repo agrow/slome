@@ -7,10 +7,13 @@ using TL.EmotionalAI;
 
 public class PlayerInputManager : MonoBehaviour
 {
+    // Input Action for interaction key
     private InputAction interactAction;   
     public GameObject playerUICanvas; 
     public TextMeshProUGUI output;
     public TMP_InputField playerInput;
+
+    // Parsed action from input
     private PlayerAction parsedAction;
     private Dictionary<string, PlayerAction> commandMap;
 
@@ -137,9 +140,12 @@ public class PlayerInputManager : MonoBehaviour
         playerUICanvas.SetActive(false);
         // Find all NPCs and trigger interaction
         NPCController[] allNPCs = FindObjectsByType<NPCController>(FindObjectsSortMode.None);
+        Debug.Log($"[GLOBAL_INPUT] Found {allNPCs.Length} NPCs in scene");
+        
         bool anyNPCTriggered = false;
         foreach (NPCController npc in allNPCs)
         {
+            Debug.Log($"[GLOBAL_INPUT] Checking NPC: {npc.name}, IsPlayerNearby: {npc.IsPlayerNearby()}");
             if (npc.IsPlayerNearby())
             {
                 Debug.Log($"[GLOBAL_INPUT] Triggering interaction with {npc.name}");
