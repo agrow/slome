@@ -25,6 +25,7 @@ public class PlayerInputManager : MonoBehaviour
                                    // add intensity levels to player actions, so that every intent has a base pad, multiplied by the degree at which 
                                    // the action is considered
                                    // ...existing code...
+        Debug.Log($"[DEBUG] playerUICanvas assigned: {playerUICanvas != null}");
         commandMap = new Dictionary<string, PlayerAction>()
         {
             // Affection
@@ -91,7 +92,6 @@ public class PlayerInputManager : MonoBehaviour
             { "lie",             PlayerAction.Pressure },
             { "blackmail",       PlayerAction.Withhold }
         };
-
 
         
         // Setup Input Action for T key
