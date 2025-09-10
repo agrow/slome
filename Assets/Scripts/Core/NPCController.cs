@@ -32,7 +32,7 @@ namespace TL.Core
         [Header("Other Components")]
         public NPCInventory Inventory { get; private set; }
         public Stats stats { get; private set; }
-        public Context context { get; private set; }
+        [SerializeField] public Context context;
         public EmotionalState emotionalState { get; private set; }
         public NavMeshAgent agent { get; private set; }
         public Animator anim { get; private set; }
