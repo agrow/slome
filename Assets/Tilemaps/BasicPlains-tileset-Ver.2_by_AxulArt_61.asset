@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BasicPlains-tileset-Ver.2_by_AxulArt_61
   m_EditorClassIdentifier: 
   m_Sprite: {fileID: -636394403, guid: f45847a4818ba1747840e315fe594f00, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.78918946, g: 0.8710852, b: 0.8867924, a: 1}
   m_Transform:
     e00: 1
     e01: 0
