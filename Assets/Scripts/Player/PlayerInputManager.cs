@@ -15,7 +15,7 @@ public class PlayerInputManager : MonoBehaviour
 
     // Parsed action from input
     private PlayerAction parsedAction;
-    private Dictionary<string, PlayerAction> commandMap;
+    public Dictionary<string, PlayerAction> commandMap;
 
     public bool EmotionalTriggered { get; set;}
 
@@ -88,7 +88,7 @@ public class PlayerInputManager : MonoBehaviour
             { "withdraw",        PlayerAction.Withdraw },
             { "demand",          PlayerAction.Demand },
 
-            //Manipulation
+            //Manipulation -- need to fix mapping
             { "guilt_trip",      PlayerAction.GiftLarge },
             { "bribe",           PlayerAction.GuiltTrip },
             { "threaten",        PlayerAction.Flatter },
