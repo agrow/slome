@@ -56,7 +56,7 @@ namespace TL.UtilityAI.Actions
             else
             {
                 // Fallback: stay in place if no context or destinations
-                RequiredDestination = npc.transform;
+                RequiredDestination = npc.transform; 
                 Debug.LogWarning($"{npc.name}: No context or resource destinations found, staying in place for work");
             }
             
