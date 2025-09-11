@@ -37,7 +37,9 @@ namespace TL.Core
         public NavMeshAgent agent { get; private set; }
         public Animator anim { get; private set; }
 
-        public NewPlayerInputManager playerInputManager  { get; private set; }
+        public PlayerInputManager playerInputManager  { get; private set; }
+        //public NewPlayerInputManager newPlayerInputManager  { get; private set; }
+
 
         [Header("Movement Settings")]
         public float speed = 3f;
@@ -78,7 +80,10 @@ namespace TL.Core
         private void InitializeComponents()
         {
             aiBrain = GetComponent<AIBrain>();
-            playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<NewPlayerInputManager>();;
+            // for when i go back to new system
+            // playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<NewPlayerInputManager>();;
+            playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<PlayerInputManager>();;
+            // old system, but its fine. 
             emotionBrain = GetComponent<EmotionBrain>();
             emotionModel = GetComponent<EmotionModel>();
             Inventory = GetComponent<NPCInventory>();
