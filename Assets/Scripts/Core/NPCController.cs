@@ -37,8 +37,8 @@ namespace TL.Core
         public NavMeshAgent agent { get; private set; }
         public Animator anim { get; private set; }
 
-        public PlayerInputManager playerInputManager  { get; private set; }
-        //public NewPlayerInputManager newPlayerInputManager  { get; private set; }
+       // public PlayerInputManager playerInputManager  { get; private set; }
+        public NewPlayerInputManager playerInputManager  { get; private set; }
 
 
         [Header("Movement Settings")]
@@ -82,7 +82,7 @@ namespace TL.Core
             aiBrain = GetComponent<AIBrain>();
             // for when i go back to new system
             // playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<NewPlayerInputManager>();;
-            playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<PlayerInputManager>();;
+            playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<NewPlayerInputManager>();;
             // old system, but its fine. 
             emotionBrain = GetComponent<EmotionBrain>();
             emotionModel = GetComponent<EmotionModel>();
@@ -383,7 +383,7 @@ namespace TL.Core
          */
         private bool ShouldUseEmotionalActions()
         {
-            return IsPlayerNearby() && playerInputManager.EmotionalTriggered;
+            return IsPlayerNearby() && playerInputManager.EmotionalTriggered; // emotional trigger
         }
 
         public void TriggerEmotionalInteraction(PlayerAction action)
@@ -397,8 +397,11 @@ namespace TL.Core
                 lastEmotionalTrigger = Time.time;
                 hasRespondedToCurrentTrigger = false; // Reset for new T press
 
-                // Apply a player action to update the emotional model
-                emotionModel.ApplyPlayerAction(action, 1.0f);
+                // Apply a player action to update the emotional model with action-specific intensity
+                float actionIntensity = PlayerActionIntensity.Get(action);
+                emotionModel.ApplyPlayerAction(action, actionIntensity);
+                
+                Debug.Log($"{name}: Action intensity: {actionIntensity:F1}x");
 
                 Debug.Log($"{name}: Applied action: {action}");
                 Debug.Log($"{name}: New PAD: P={emotionModel.pad.P:F2}, A={emotionModel.pad.A:F2}, D={emotionModel.pad.D:F2}");

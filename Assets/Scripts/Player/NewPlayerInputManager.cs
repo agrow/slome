@@ -34,19 +34,18 @@ public class NewPlayerInputManager : MonoBehaviour
 
     void Start()
     {
-        EmotionalTriggered = true;
+        EmotionalTriggered = false;
 
         Debug.Log($"[DEBUG] playerUICanvas assigned: {playerUICanvas != null}");
 
         // --- Bind T key to open the UI panel ---
         interactAction = new InputAction("interact", InputActionType.Button);
-        interactAction.AddBinding("<Keyboard>/t");
-        interactAction.performed += OnInteractPressed;
+        interactAction.AddBinding("<Keyboard>/t"); 
+        interactAction.performed += OnInteractPressed; // Subscribe to the performed event
         interactAction.Enable();
 
         // (Optional) Initialize label
         if (selectedActionLabel) selectedActionLabel.text = "Selected: (none)";
-
         Debug.Log("[GLOBAL_INPUT] PlayerInputManager initialized");
     }
 
@@ -122,6 +121,9 @@ public class NewPlayerInputManager : MonoBehaviour
             return;
         }
 
+        // Set the emotional trigger flag for NPCs to detect
+        EmotionalTriggered = true;
+        
         // Success → clear & close (optional)
         ClearSelectedAction();
         if (playerUICanvas) playerUICanvas.SetActive(false);
