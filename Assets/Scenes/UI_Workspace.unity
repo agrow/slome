@@ -3099,6 +3099,7 @@ MonoBehaviour:
   playerUICanvas: {fileID: 299545574}
   output: {fileID: 787173613}
   selectedActionLabel: {fileID: 1432045230}
+  npcDialogueCanvas: {fileID: 0}
   npcStatusDisplay: {fileID: 787173613}
 --- !u!1 &747708375
 GameObject:
@@ -3500,8 +3501,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 15
+  m_fontSizeBase: 15
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5905,7 +5906,8 @@ MonoBehaviour:
   playerUICanvas: {fileID: 299545574}
   output: {fileID: 708270733}
   selectedActionLabel: {fileID: 1432045230}
-  npcStatusDisplay: {fileID: 0}
+  npcDialogueCanvas: {fileID: 779911366}
+  npcStatusDisplay: {fileID: 787173613}
 --- !u!1 &1493370610
 GameObject:
   m_ObjectHideFlags: 0
