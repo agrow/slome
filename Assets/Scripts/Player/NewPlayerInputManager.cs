@@ -24,6 +24,10 @@ public class NewPlayerInputManager : MonoBehaviour
     public GameObject playerUICanvas;           // The panel you show/hide
     public TextMeshProUGUI output;              // Status messages (optional)
     public TextMeshProUGUI selectedActionLabel; // Optional: shows "Selected: X"
+    
+    [Header("NPC Dialogue UI")]
+    public GameObject npcDialogueCanvas;        // Separate canvas for NPC dialogue
+    public TextMeshProUGUI npcStatusDisplay;    // Shows NPC emotional state info
 
     // === State ===
     // The currently selected action (chosen from the scroll list). Not executed until Confirm.
@@ -109,6 +113,10 @@ public class NewPlayerInputManager : MonoBehaviour
             {
                 Debug.Log($"[GLOBAL_INPUT] Triggering interaction with {npc.name}");
                 npc.TriggerEmotionalInteraction(action);
+                
+                // Update UI with NPC status after interaction
+                UpdateNPCStatusDisplay(npc, action);
+                
                 anyNPCTriggered = true;
                 break;
             }
@@ -137,6 +145,45 @@ public class NewPlayerInputManager : MonoBehaviour
             selectedActionLabel.text = "Selected: (none)";
     }
 
+    // === Update NPC status display ===
+    private void UpdateNPCStatusDisplay(NPCController npc, PlayerAction playerAction)
+    {
+        if (npcStatusDisplay == null) return;
+        
+        // Activate the NPC dialogue canvas
+        if (npcDialogueCanvas != null)
+        {
+            npcDialogueCanvas.SetActive(true);
+        }
+        
+        var emotionModel = npc.emotionModel;
+        if (emotionModel == null)
+        {
+            npcStatusDisplay.text = "No emotion data available";
+            return;
+        }
+        
+        // Get current NPC action (if available)
+        string npcAction = "None";
+        if (npc.emotionBrain?.bestAction != null)
+        {
+            npcAction = npc.emotionBrain.bestAction.Name;
+        }
+        
+        // Format the display
+        string statusText = $"<b>{npc.name} Status:</b>\n" +
+                           $"Player Action: {Pretty(playerAction)}\n" +
+                           $"NPC Response: {npcAction}\n\n" +
+                           $"<b>Emotional State:</b>\n" +
+                           $"Emotion: {emotionModel.lastEmotion}\n" +
+                           $"P: {emotionModel.pad.P:F2} | A: {emotionModel.pad.A:F2} | D: {emotionModel.pad.D:F2}\n\n" +
+                           $"<b>Relationship:</b>\n" +
+                           $"Type: {emotionModel.GetCurrentRelationshipType()}\n" +
+                           $"I: {emotionModel.tri.I:F2} | Pa: {emotionModel.tri.Pa:F2} | C: {emotionModel.tri.C:F2}";
+        
+        npcStatusDisplay.text = statusText;
+    }
+    
     // === Pretty-print for UI labels ===
     private static string Pretty(PlayerAction a)
     {
