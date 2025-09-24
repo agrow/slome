@@ -61,37 +61,32 @@ namespace TL.EmotionalAI
         }
 
         // prps stmt: apply player actions with personality and relationship integration!  this is called from npc controller
-        /// Map Player Action By Intent → Get Intensity Modifier  → Calculate Relationship Delta
-        /// → Calculate PAD Delta -> Apply Relationship Amp → Apply PAD Delta -> Update Emotion from last one!
-        public void ApplyPlayerAction(PlayerAction action, float intensity = 1.0f) // this intent pretty useless rn 
+        /// Map Player Action By Intent → Calculate Relationship Delta → Calculate PAD Delta -> Apply Relationship Amp → Apply PAD Delta -> Update Emotion
+        public void ApplyPlayerAction(PlayerAction action, float intensity = 1.0f)
         {
             // 1. Map action to intent
             lastIntent = IntentMapper.Map(action);
         
-            // 2. Get the action's intensity modifier (now just a float, not per-triangle)
-            float actionIntensity = GetActionIntensityModifier(action);
-
-            // 3. Use intent to get relationship triangle delta
-            Vector3 relationshipDelta = BaseRelationshipDeltaByIntent.Get(lastIntent) * actionIntensity;
+            // 2. Use intent to get relationship triangle delta (using base intensity for relationships)
+            Vector3 relationshipDelta = BaseRelationshipDeltaByIntent.Get(lastIntent) * 0.3f;
             UpdateRelationship(relationshipDelta.x, relationshipDelta.y, relationshipDelta.z);
 
-            // 4. Calculate PAD delta using intent and action intensity
-            Vector3 baseDelta = GetEmotionalDelta(action, actionIntensity);
+            // 3. Calculate PAD delta using intent and player action intensity
+            Vector3 baseDelta = GetEmotionalDelta(action, intensity);
         
-           
-            // 5. Apply relationship amplification
+            // 4. Apply relationship amplification
             Triangle currentTriangle = relationshipProfile != null ? relationshipProfile.GetTriangle() : tri;
             baseDelta = RelationshipAmplifier.Apply(baseDelta, currentTriangle);
         
-            // 6. Store for diagnostics and apply to PAD
+            // 5. Store for diagnostics and apply to PAD
             lastDeltaApplied = baseDelta;
             ApplyPADDelta(baseDelta);        
         
-            // 7. Update emotion
+            // 6. Update emotion
             lastEmotion = EmotionClassifier.From(pad);
         
-            // 8. Log everything
-            Debug.Log($"{name}: Action '{action}' (Intent: '{lastIntent}') | PAD Δ: {baseDelta} | Relationship: {GetCurrentRelationshipType()} | Triangle: I={currentTriangle.I:F2}, Pa={currentTriangle.Pa:F2}, C={currentTriangle.C:F2} | Emotion: {lastEmotion}");
+            // 7. Log everything
+            Debug.Log($"{name}: Action '{action}' (Intent: '{lastIntent}') | Intensity: {intensity:F1}x | PAD Δ: {baseDelta} | Relationship: {GetCurrentRelationshipType()} | Triangle: I={currentTriangle.I:F2}, Pa={currentTriangle.Pa:F2}, C={currentTriangle.C:F2} | Emotion: {lastEmotion}");
         }
 
 
@@ -155,78 +150,7 @@ namespace TL.EmotionalAI
             lastEmotion = EmotionClassifier.From(pad);
         }
 
-        //purpose stmt: gets the action intensity modifier for fine-tuning within intents
-        private float GetActionIntensityModifier(PlayerAction action)
-        {
-            return action switch
-            {
-                // Affection
-                PlayerAction.ComplimentLooks => 0.3f,
-                PlayerAction.Hug => 0.4f,
-                PlayerAction.HoldHands => 0.3f,
-                PlayerAction.Comfort => 0.3f,
-                PlayerAction.Encourage => 0.3f,
-                PlayerAction.GiftSmall => 0.3f,
 
-                // Desire
-                PlayerAction.KissQuick => 0.5f,
-                PlayerAction.KissDeep => 0.6f,
-                PlayerAction.Flirt => 0.3f,
-                PlayerAction.Seduce => 0.4f,
-                PlayerAction.LongFor => 0.3f,
-
-                // Bonding
-                PlayerAction.InviteActivity => 0.4f,
-                PlayerAction.ShareStory => 0.3f,
-                PlayerAction.Reminisce => 0.3f,
-                PlayerAction.Celebrate => 0.4f,
-                PlayerAction.Support => 0.3f,
-
-                // Trust
-                PlayerAction.Apology => 0.3f,
-                PlayerAction.Confide => 0.3f,
-                PlayerAction.Forgive => 0.3f,
-                PlayerAction.AskHelp => 0.3f,
-                PlayerAction.Promise => 0.3f,
-
-                // Respect
-                PlayerAction.ComplimentSkill => 0.3f,
-                PlayerAction.Acknowledge => 0.3f,
-                PlayerAction.Admire => 0.3f,
-                PlayerAction.Defend => 0.4f,
-                PlayerAction.Praise => 0.3f,
-
-                // Playfulness
-                PlayerAction.TeasePlayful => 0.3f,
-                PlayerAction.Joke => 0.3f,
-                PlayerAction.Challenge => 0.4f,
-                PlayerAction.Surprise => 0.4f,
-                PlayerAction.Trick => 0.3f,
-
-                // Security
-                PlayerAction.KeepPromise => 0.4f,
-                PlayerAction.Reassure => 0.3f,
-                PlayerAction.Protect => 0.4f,
-                PlayerAction.Shelter => 0.3f,
-                PlayerAction.Steady => 0.3f,
-
-                // Conflict
-                PlayerAction.TeaseHarsh => 0.4f,
-                PlayerAction.Confront => 0.4f,
-                PlayerAction.Criticize => 0.3f,
-                PlayerAction.Withdraw => 0.2f,
-                PlayerAction.Demand => 0.4f,
-
-                // Manipulation
-                PlayerAction.GiftLarge => 0.4f,
-                PlayerAction.GuiltTrip => 0.3f,
-                PlayerAction.Flatter => 0.3f,
-                PlayerAction.Pressure => 0.4f,
-                PlayerAction.Withhold => 0.3f,
-
-                _ => 0.3f
-            };
-        }
 
 
 
@@ -242,19 +166,14 @@ namespace TL.EmotionalAI
         // prps stmt: the GetEmotionalDelta method to use Intent → BasePAD flow
         private Vector3 GetEmotionalDelta(PlayerAction action, float intensity)
         {
-
-            // Step 1: Map action to intent !
+            // Step 1: Map action to intent
             Intent intent = IntentMapper.Map(action);
-
 
             // Step 2: Get base PAD delta for that intent
             Vector3 intentBaseDelta = BasePadByIntent.Get(intent);
 
-            // Step 3: Apply action-specific intensity modifier (optional refinement)
-            float actionModifier = GetActionIntensityModifier(action);
-
-            // Step 4: Combine intent base + action intensity + player intensity
-            Vector3 finalDelta = intentBaseDelta * actionModifier * intensity;
+            // Step 3: Apply player action intensity (only system now)
+            Vector3 finalDelta = intentBaseDelta * intensity;
 
             return finalDelta;
         }
@@ -287,11 +206,24 @@ namespace TL.EmotionalAI
         // purpose stmt: applies the PAD delta to the current PAD values
         private void ApplyPADDelta(Vector3 delta)
         {
+            // Store PAD before changes
+            PAD padBefore = new PAD { P = pad.P, A = pad.A, D = pad.D };
+            
+            Debug.Log($"{name}: PAD BEFORE: P={padBefore.P:F3}, A={padBefore.A:F3}, D={padBefore.D:F3}");
+            Debug.Log($"{name}: PAD DELTA: ΔP={delta.x:F3}, ΔA={delta.y:F3}, ΔD={delta.z:F3}");
+            
+            // Apply delta with clamping
             pad.P = Mathf.Clamp01(pad.P + delta.x);
             pad.A = Mathf.Clamp01(pad.A + delta.y);
             pad.D = Mathf.Clamp01(pad.D + delta.z);
+            
+            // Calculate actual delta after clamping
+            Vector3 finalDelta = new Vector3(pad.P - padBefore.P, pad.A - padBefore.A, pad.D - padBefore.D);
+            
+            Debug.Log($"{name}: PAD AFTER: P={pad.P:F3}, A={pad.A:F3}, D={pad.D:F3}");
+            Debug.Log($"{name}: PAD DELTA FINAL: ΔP={finalDelta.x:F3}, ΔA={finalDelta.y:F3}, ΔD={finalDelta.z:F3}");
 
-            lastDeltaApplied = delta;
+            lastDeltaApplied = finalDelta;
             lastEmotion = EmotionClassifier.From(pad);
         }
         //private helper methods 
