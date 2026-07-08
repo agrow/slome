@@ -145,7 +145,7 @@ namespace TL.Core
             if (agent == null)
                 Debug.LogError($"{name}: NavMeshAgent component missing!");
             if (playerInputManager == null)
-                Debug.LogError($"{name}: PlayerInputManager component missing!");
+                Debug.LogError($"{name}: NewPlayerInputManager component missing!");
         }
 
         void Update()
@@ -302,7 +302,10 @@ namespace TL.Core
                 if (useEmotional && emotionBrain != null)
                 {
                     emotionBrain.finishedExecutingBestAction = false;
-                    playerInputManager.EmotionalTriggered = false; // Reset the flag after triggering
+                    if (playerInputManager != null)
+                    {
+                        playerInputManager.EmotionalTriggered = false; // Reset the flag after triggering
+                    }
                 }
                 else if (aiBrain != null)
                 {
@@ -383,7 +386,7 @@ namespace TL.Core
          */
         private bool ShouldUseEmotionalActions()
         {
-            return IsPlayerNearby() && playerInputManager.EmotionalTriggered; // emotional trigger
+            return IsPlayerNearby() && playerInputManager != null && playerInputManager.EmotionalTriggered; // emotional trigger
         }
 
         public void TriggerEmotionalInteraction(PlayerAction action)
@@ -410,6 +413,10 @@ namespace TL.Core
                 // Go to decide state - let FSM handle the response properly
                 currentState = State.decide;                
                 // REMOVED: Manual execution - let the state machine handle it
+            }
+            else
+            {
+                Debug.LogWarning($"{name}: Cannot run emotional interaction. EmotionBrain present: {emotionBrain != null}, EmotionModel present: {emotionModel != null}");
             }
         }
 
