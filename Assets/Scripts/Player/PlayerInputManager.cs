@@ -126,7 +126,6 @@ public class PlayerInputManager : MonoBehaviour
     // Called by the Done button
     public void ParseInput()
     {
-        EmotionalTriggered = true; // Initialize to true to allow first interaction
         playerUICanvas.SetActive(false); // Hide UI at start
         string inputText = playerInput.text.ToLower().Trim();
         // Validate and parse input
@@ -136,6 +135,8 @@ public class PlayerInputManager : MonoBehaviour
             Debug.LogWarning($"[GLOBAL_INPUT] Invalid action input: {inputText}");
             return;
         }
+
+        EmotionalTriggered = true; // Raise the trigger before NPCs process the interaction
         
         playerUICanvas.SetActive(false);
         // Find all NPCs and trigger interaction

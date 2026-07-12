@@ -37,8 +37,9 @@ namespace TL.Core
         public NavMeshAgent agent { get; private set; }
         public Animator anim { get; private set; }
 
-       // public PlayerInputManager playerInputManager  { get; private set; }
-        public NewPlayerInputManager playerInputManager  { get; private set; }
+    // public PlayerInputManager playerInputManager  { get; private set; }
+     public PlayerInputManager legacyPlayerInputManager { get; private set; }
+     public NewPlayerInputManager playerInputManager  { get; private set; }
 
 
         [Header("Movement Settings")]
@@ -80,9 +81,12 @@ namespace TL.Core
         private void InitializeComponents()
         {
             aiBrain = GetComponent<AIBrain>();
-            // for when i go back to new system
-            // playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<NewPlayerInputManager>();;
-            playerInputManager = GameObject.Find("PlayerCommandUI").GetComponent<NewPlayerInputManager>();;
+            GameObject playerCommandUI = GameObject.Find("PlayerCommandUI");
+            if (playerCommandUI != null)
+            {
+                legacyPlayerInputManager = playerCommandUI.GetComponent<PlayerInputManager>();
+                playerInputManager = playerCommandUI.GetComponent<NewPlayerInputManager>();
+            }
             // old system, but its fine. 
             emotionBrain = GetComponent<EmotionBrain>();
             emotionModel = GetComponent<EmotionModel>();
@@ -105,7 +109,9 @@ namespace TL.Core
             if (agent != null)
             {
                 agent.speed = speed;
-                agent.stoppingDistance = 1f;
+                Debug.LogWarning($"{name}: NewPlayerInputManager component missing (legacy manager may still be used).");
+            if (legacyPlayerInputManager == null)
+                Debug.LogWarning($"{name}: Legacy PlayerInputManager component missing (new manager may still be used).");
                 agent.angularSpeed = 360f;
                 agent.acceleration = 8f;
                 agent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
@@ -189,7 +195,7 @@ namespace TL.Core
             
             // Add debug info for emotional state
             float timeSinceLastTrigger = Time.time - lastEmotionalTrigger;
-            //Debug.Log($"{name}: Time since T press: {timeSinceLastTrigger:F1}s, Responded: {hasRespondedToCurrentTrigger}");
+            Debug.Log($"{name}: Decide input -> useEmotional={useEmotional}, EmotionalTriggered={GetEmotionalTriggeredDebugValue()}, Nearby={IsPlayerNearby()}, TimeSinceLastTrigger={timeSinceLastTrigger:F1}, Responded={hasRespondedToCurrentTrigger}");
             
             // Reset execution flag
             isExecutingAction = false;
@@ -306,6 +312,10 @@ namespace TL.Core
                     {
                         playerInputManager.EmotionalTriggered = false; // Reset the flag after triggering
                     }
+                    if (legacyPlayerInputManager != null)
+                    {
+                        legacyPlayerInputManager.EmotionalTriggered = false;
+                    }
                 }
                 else if (aiBrain != null)
                 {
@@ -386,7 +396,34 @@ namespace TL.Core
          */
         private bool ShouldUseEmotionalActions()
         {
-            return IsPlayerNearby() && playerInputManager != null && playerInputManager.EmotionalTriggered; // emotional trigger
+            bool nearby = IsPlayerNearby();
+            bool triggered = IsEmotionalTriggered();
+            bool shouldUse = nearby && triggered;
+
+            //Debug.Log($"{name}: ShouldUseEmotionalActions -> nearby={nearby}, triggered={triggered}, result={shouldUse}");
+            return shouldUse; // emotional trigger
+        }
+
+        private bool IsEmotionalTriggered()
+        {
+            if (playerInputManager != null && playerInputManager.EmotionalTriggered)
+                return true;
+
+            if (legacyPlayerInputManager != null && legacyPlayerInputManager.EmotionalTriggered)
+                return true;
+
+            return false;
+        }
+
+        private string GetEmotionalTriggeredDebugValue()
+        {
+            if (playerInputManager != null)
+                return $"new={playerInputManager.EmotionalTriggered}";
+
+            if (legacyPlayerInputManager != null)
+                return $"legacy={legacyPlayerInputManager.EmotionalTriggered}";
+
+            return "none";
         }
 
         public void TriggerEmotionalInteraction(PlayerAction action)

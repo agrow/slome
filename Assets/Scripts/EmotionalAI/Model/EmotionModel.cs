@@ -32,7 +32,7 @@ namespace TL.EmotionalAI
     
     public class EmotionModel : MonoBehaviour
     {
-        [Header("Personality Integration")]
+        [Header("Personality")]
         public PersonalityTypeDefinition personalityType;
 
         // Add this field for relationship status
