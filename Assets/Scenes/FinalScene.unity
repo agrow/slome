@@ -2312,7 +2312,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c3524d53ffb546a199992b5093d9390, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  personalityType: {fileID: 11400000, guid: a46cd71c44262b5489468d4f3d2c9b83, type: 2}
+  personalityType: {fileID: 11400000, guid: 1c8781f349d3a5841b0a42c051c228a8, type: 2}
   relationshipProfile: {fileID: 0}
   pad:
     P: 0.5
@@ -2386,7 +2386,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 905e36d333f9e44949a20ec0fb17d973, type: 2}
   - {fileID: 11400000, guid: 0ca5eec783a3c404b971f26bac08e6db, type: 2}
   - {fileID: 11400000, guid: 3d98b69764606451eab916f69bff3fb8, type: 2}
-  npcPersonality: {fileID: 0}
+  npcPersonality: {fileID: 11400000, guid: 1c8781f349d3a5841b0a42c051c228a8, type: 2}
 --- !u!114 &747508664
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3527,7 +3527,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 905e36d333f9e44949a20ec0fb17d973, type: 2}
   - {fileID: 11400000, guid: 0ca5eec783a3c404b971f26bac08e6db, type: 2}
   - {fileID: 11400000, guid: 3d98b69764606451eab916f69bff3fb8, type: 2}
-  npcPersonality: {fileID: 0}
+  npcPersonality: {fileID: 11400000, guid: a46cd71c44262b5489468d4f3d2c9b83, type: 2}
 --- !u!114 &1223646118
 MonoBehaviour:
   m_ObjectHideFlags: 0
