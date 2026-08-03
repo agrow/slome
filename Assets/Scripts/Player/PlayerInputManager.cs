@@ -72,7 +72,7 @@ public class PlayerInputManager : MonoBehaviour
             { "joke",             PlayerAction.Joke },
             { "challenge",        PlayerAction.Challenge },
             { "surprise",         PlayerAction.Surprise },
-            { "trick",            PlayerAction.Trick },
+            { "playful_trick",            PlayerAction.PlayfulTrick },
         
             // Security
             { "keep_promise",     PlayerAction.KeepPromise },

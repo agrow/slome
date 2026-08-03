@@ -45,25 +45,52 @@ namespace TL.EmotionalAI
         public float ScoreAction(EmotionModel emo)
         {
             if (Time.time < cooldownUntil) { score = 0f; return 0f; }
-            if (considerations == null || considerations.Length == 0) { score = 0.5f * weight; return score; }
 
-            // Multiply (AND-like)
-            float product = 1f;
-            for (int i=0;i<considerations.Length;i++)
+            float utility;
+            if (considerations == null || considerations.Length == 0)
             {
-                float c = Mathf.Clamp01(considerations[i].ScoreConsideration(emo));
-                product *= c;
-                if (product <= 0f) { score = 0f; return 0f; }
+                utility = 0.5f;
             }
+            else
+            {
+                // Multiply (AND-like)
+                float product = 1f;
+                for (int i=0;i<considerations.Length;i++)
+                {
+                    float c = Mathf.Clamp01(considerations[i].ScoreConsideration(emo));
+                    product *= c;
+                    if (product <= 0f) { score = 0f; return 0f; }
+                }
 
-            // Dave Mark makeup: p + (1-p)*p*(1-1/n)
-            int n = considerations.Length;
-            float modFactor = 1f - (1f / n);
-            float combined = product + (1f - product) * modFactor * product;
-
-            float utility = Mathf.Clamp01(utilityCurve.Evaluate(Mathf.Clamp01(combined)));
-            score = Mathf.Clamp01(utility * weight);
+                // Dave Mark makeup: p + (1-p)*p*(1-1/n)
+                int n = considerations.Length;
+                float modFactor = 1f - (1f / n);
+                float combined = product + (1f - product) * modFactor * product;
+                utility = Mathf.Clamp01(utilityCurve.Evaluate(Mathf.Clamp01(combined)));
+            }
+            float intentFit = GetIntentCompatibilityMultiplier(emo != null ? emo.lastIntent : Intent.Bonding);
+            score = Mathf.Clamp01(utility * weight * intentFit);
             return score;
+        }
+
+        protected virtual float GetIntentCompatibilityMultiplier(Intent playerIntent)
+        {
+            return playerIntent switch
+            {
+                Intent.Desire => BiasPreset switch
+                {
+                    BiasPreset.ComplimentLooks or BiasPreset.Hug or BiasPreset.HoldHands or BiasPreset.Comfort or BiasPreset.Encourage or BiasPreset.KissQuick or BiasPreset.KissDeep or BiasPreset.Flirt or BiasPreset.Seduce or BiasPreset.LongFor => 1.15f,
+                    BiasPreset.GiftLarge or BiasPreset.GuiltTrip or BiasPreset.Flatter or BiasPreset.Pressure or BiasPreset.Withhold or BiasPreset.Manipulation or BiasPreset.TeaseHarsh or BiasPreset.Confront or BiasPreset.Criticize or BiasPreset.Withdraw or BiasPreset.Demand => 0.60f,
+                    _ => 1.00f
+                },
+                Intent.Affection => BiasPreset switch
+                {
+                    BiasPreset.ComplimentLooks or BiasPreset.Hug or BiasPreset.HoldHands or BiasPreset.Comfort or BiasPreset.Encourage or BiasPreset.KissQuick or BiasPreset.KissDeep or BiasPreset.Flirt or BiasPreset.Seduce or BiasPreset.LongFor => 1.12f,
+                    BiasPreset.GiftLarge or BiasPreset.GuiltTrip or BiasPreset.Flatter or BiasPreset.Pressure or BiasPreset.Withhold or BiasPreset.Manipulation or BiasPreset.TeaseHarsh or BiasPreset.Confront or BiasPreset.Criticize or BiasPreset.Withdraw or BiasPreset.Demand => 0.65f,
+                    _ => 1.00f
+                },
+                _ => 1.00f
+            };
         }
 
         public virtual void Execute(EmotionModel emo, Animator animator=null)

@@ -30,7 +30,7 @@ namespace TL.Personality
         ComplimentSkill, Acknowledge, Admire, Defend, Praise,
 
         // Playfulness
-        TeasePlayful, Joke, Challenge, Surprise, Trick,
+        TeasePlayful, Joke, Challenge, Surprise, PlayfulTrick,
 
         // Security
         KeepPromise, Reassure, Protect, Deflect, Anchor,
@@ -122,7 +122,7 @@ namespace TL.Personality
                     return new() { Bias(Axis.Energy,1.10f,0.95f), Bias(Axis.Tactics,0.98f,1.10f) };
                 case BiasPreset.Surprise:
                     return new() { Bias(Axis.Energy,1.10f,0.95f) };
-                case BiasPreset.Trick:
+                case BiasPreset.PlayfulTrick:
                     return new() { Bias(Axis.Tactics,0.98f,1.10f) };
 
                 // ---------- SECURITY ----------
