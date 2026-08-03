@@ -28,7 +28,7 @@ namespace TL.EmotionalAI
         ComplimentSkill, Acknowledge, Admire, Defend, Praise,
 
         // Playfulness
-        TeasePlayful, Joke, Challenge, Surprise, Trick,
+        TeasePlayful, Joke, Challenge, Surprise, PlayfulTrick,
 
         // Security
         KeepPromise, Reassure, Protect, Shelter, Steady,

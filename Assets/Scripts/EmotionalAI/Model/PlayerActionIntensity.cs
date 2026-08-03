@@ -54,7 +54,7 @@ namespace TL.EmotionalAI
                 PlayerAction.Joke => 0.8f,
                 PlayerAction.Challenge => 1.2f,
                 PlayerAction.Surprise => 1.3f,
-                PlayerAction.Trick => 1.0f,
+                PlayerAction.PlayfulTrick => 1.0f,
 
                 // SECURITY - Moderate positive
                 PlayerAction.KeepPromise => 1.5f,

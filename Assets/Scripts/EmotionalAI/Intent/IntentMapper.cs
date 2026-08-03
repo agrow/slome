@@ -46,7 +46,7 @@ namespace TL.EmotionalAI
             PlayerAction.Joke => Intent.Playfulness,
             PlayerAction.Challenge => Intent.Playfulness,
             PlayerAction.Surprise => Intent.Playfulness,
-            PlayerAction.Trick => Intent.Playfulness,
+            PlayerAction.PlayfulTrick => Intent.Playfulness,
 
             // Security
             PlayerAction.KeepPromise => Intent.Security,
