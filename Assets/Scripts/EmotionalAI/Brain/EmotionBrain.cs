@@ -50,7 +50,8 @@ namespace TL.EmotionalAI
             for (int i = 0; i < actions.Length; i++)
             {
                 actions[i].EnsurePersonalityBiasesInitialized();
-                Debug.Log($"{name}: Scoring action {actions[i].name} with {actions[i].PersonalityBiases.Count} personality bias entries.");
+                //certain actions can be affected by more than one component of a personality type
+                Debug.Log($"{name}: Action {actions[i].name} is affected by {actions[i].PersonalityBiases.Count} personality components.");
                 // 1) Your existing per-action score (PAD Axis × ΔPAD × IntentMatch → curve)
                 float curved = actions[i].ScoreAction(emotion);
 
