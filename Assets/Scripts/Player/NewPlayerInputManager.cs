@@ -33,6 +33,11 @@ public class NewPlayerInputManager : MonoBehaviour
     // The currently selected action (chosen from the scroll list). Not executed until Confirm.
     public PlayerAction? SelectedAction { get; private set; }
 
+    [Header("Behavior")]
+    [Tooltip("If true the player UI will close after confirming an action. Set false to keep UI open for multiple actions.")]
+
+    [SerializeField] public bool closeOnConfirm = true;
+
     // Gate to prevent spamming, if you use it elsewhere.
     public bool EmotionalTriggered { get; set; }
 
@@ -129,12 +134,15 @@ public class NewPlayerInputManager : MonoBehaviour
             return;
         }
 
-        // Set the emotional trigger flag for NPCs to detect
-        EmotionalTriggered = true;
-        
-        // Success → clear & close (optional)
-        ClearSelectedAction();
-        if (playerUICanvas) playerUICanvas.SetActive(false);
+                // Set the emotional trigger flag for NPCs to detect
+                EmotionalTriggered = true;
+
+                // Success → optionally clear & close the UI
+                if (closeOnConfirm)
+                {
+                    ClearSelectedAction();
+                    if (playerUICanvas) playerUICanvas.SetActive(false);
+                }
     }
 
     // === Clear the selection (use after confirm or when closing panel) ===

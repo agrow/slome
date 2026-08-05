@@ -13,6 +13,8 @@ public class PlayerInputManager : MonoBehaviour
     public TextMeshProUGUI output;
     public TMP_InputField playerInput;
 
+    [SerializeField] public bool closeOnConfirm = true;
+
     // Parsed action from input
     private PlayerAction parsedAction;
     public Dictionary<string, PlayerAction> commandMap;
@@ -138,7 +140,7 @@ public class PlayerInputManager : MonoBehaviour
 
         EmotionalTriggered = true; // Raise the trigger before NPCs process the interaction
         
-        playerUICanvas.SetActive(false);
+        playerUICanvas.SetActive(true);
         // Find all NPCs and trigger interaction
         NPCController[] allNPCs = FindObjectsByType<NPCController>(FindObjectsSortMode.None);
         Debug.Log($"[GLOBAL_INPUT] Found {allNPCs.Length} NPCs in scene");
